@@ -1,0 +1,19 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-20T17:23:12.347Z",
+  "summary": "The diff implements all three requested requirements: fixed add-to-cart functionality with proper authentication checks and toast notifications, updated Vixen T.T Ball price to ₹20 via migration and display logic, and fixed cash-on-delivery checkout flow with payment method selection and order completion. All implementations align with the BuildRequest specifications.",
+  "missing_requirements": [],
+  "hallucinated_features": [],
+  "confidence": 0.95,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/ProductCard.tsx",
+    "frontend/src/pages/Cart.tsx",
+    "frontend/src/pages/Checkout.tsx",
+    "project_state.json"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-20T17:23:12.351Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 2,
+    "items": [
+      {
+        "id": "REQ-25",
+        "summary": "Debug and fix the add-to-cart functionality so that when users click the 'Add to Cart' button on any product card, the product is successfully added to their shopping cart and the cart item count badge updates in the header navigation",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/ProductCard.tsx",
+          "frontend/src/components/Layout.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/ProductCard.tsx",
+          "frontend/src/components/Layout.tsx"
+        ]
+      },
+      {
+        "id": "REQ-26",
+        "summary": "Fix the Vixen T.T Ball product price display to show ₹20 instead of the current incorrect price throughout the application including the product catalog, cart, and checkout pages",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-27",
+        "summary": "Debug and fix the cash-on-delivery payment method selection and order completion flow so that users can successfully select 'Cash' as payment method and complete their checkout",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Checkout.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/OrderConfirmation.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Checkout.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/ProductCard.tsx",
+    "frontend/src/pages/Cart.tsx",
+    "frontend/src/pages/Checkout.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "kind": "build_request",
+  "title": "Fix add-to-cart, price display, and cash-on-delivery functionality",
+  "projectName": "yourdailysprtshop",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-25",
+      "text": "Debug and fix the add-to-cart functionality so that when users click the 'Add to Cart' button on any product card, the product is successfully added to their shopping cart and the cart item count badge updates in the header navigation",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "none is working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking 'Add to Cart' on any product successfully adds the item to the cart",
+        "Cart item count badge in the header updates immediately after adding a product",
+        "Cart page displays the newly added product with correct details",
+        "No console errors occur during the add-to-cart operation"
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "text": "Fix the Vixen T.T Ball product price display to show ₹20 instead of the current incorrect price throughout the application including the product catalog, cart, and checkout pages",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "none is working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Vixen T.T Ball product displays price as ₹20 on the product catalog page",
+        "Cart page shows ₹20 per unit for Vixen T.T Ball items",
+        "Order summary on checkout page calculates totals using ₹20 per Vixen T.T Ball",
+        "Price persists correctly after backend redeployment"
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "text": "Debug and fix the cash-on-delivery payment method selection and order completion flow so that users can successfully select 'Cash' as payment method and complete their checkout",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "none is working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users can select 'Cash' payment method on the checkout page",
+        "Clicking 'Complete Order' with Cash selected successfully processes the order",
+        "User is redirected to the order confirmation page after successful checkout",
+        "Order data is properly stored in the backend with the correct payment method",
+        "No console errors occur during the checkout process"
+      ]
+    }
+  ],
+  "constraints": [
+    "Maintain the existing single-actor backend architecture",
+    "Preserve all existing product data and cart functionality",
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts",
+    "Keep the price as Nat type in the backend"
+  ],
+  "nonGoals": [
+    "Implementing the GPay payment option",
+    "Changing the overall UI design or layout",
+    "Adding new products or product categories",
+    "Modifying the admin panel functionality"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

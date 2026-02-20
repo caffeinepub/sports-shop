@@ -1,0 +1,44 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-debug-and-fix-the-add-to-cart-functionality-so-that-when-users-click-the-add-to-cart-button-on-any-product-card-the-product-is-successfully-added-to-their-shopping-cart-and-the-cart-item-count-badge-updates-in-the-header-navigation",
+      "featureTitle": "Debug and fix the add-to-cart functionality so that when users click the 'Add to Cart' button on any product card, the product is successfully added to their shopping cart and the cart item count badge updates in the header navigation",
+      "files": [
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/components/ProductCard.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-25"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-debug-and-fix-the-cash-on-delivery-payment-method-selection-and-order-completion-flow-so-that-users-can-successfully-select-cash-as-payment-method-and-complete-their-checkout",
+      "featureTitle": "Debug and fix the cash-on-delivery payment method selection and order completion flow so that users can successfully select 'Cash' as payment method and complete their checkout",
+      "files": [
+        "frontend/src/pages/Checkout.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-27"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix add-to-cart, price display, and cash-on-delivery functionality",
+  "requirements": [
+    {
+      "id": "REQ-25",
+      "summary": "Debug and fix the add-to-cart functionality to successfully add products to cart and update the cart count badge",
+      "acceptanceCriteria": [
+        "Clicking 'Add to Cart' on any product successfully adds the item to the cart",
+        "Cart item count badge in the header updates immediately after adding a product",
+        "Cart page displays the newly added product with correct details",
+        "No console errors occur during the add-to-cart operation"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review and fix the useAddToCart mutation implementation to ensure proper error handling, query invalidation for both cart and products queries, and correct bigint conversion for productId and quantity parameters. Verify that the mutation correctly calls actor.addToCart() and invalidates the 'cart' query key to trigger a refetch of cart data."
+        },
+        {
+          "path": "frontend/src/components/ProductCard.tsx",
+          "operation": "modify",
+          "description": "Review and fix the add-to-cart button click handler to ensure it correctly invokes the useAddToCart mutation with proper productId conversion to bigint. Add error handling with user-friendly toast notifications for failures. Ensure the button is properly disabled during mutation execution and shows loading state. Verify stock validation before allowing add-to-cart action."
+        },
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Review the cart count badge implementation to ensure it correctly subscribes to the cart query data from useGetCart hook. Verify that the badge displays the sum of all item quantities (not just the number of unique items) and updates immediately when cart data changes. Ensure proper handling of loading and error states."
+        }
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "summary": "Debug and fix the cash-on-delivery payment method selection and order completion flow",
+      "acceptanceCriteria": [
+        "Users can select 'Cash' payment method on the checkout page",
+        "Clicking 'Complete Order' with Cash selected successfully processes the order",
+        "User is redirected to the order confirmation page after successful checkout",
+        "Order data is properly stored in the backend with the correct payment method",
+        "No console errors occur during the checkout process"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Checkout.tsx",
+          "operation": "modify",
+          "description": "Review and fix the payment method selection state management to ensure 'cash' option maps correctly to the backend PaymentMethod.cash enum value. Fix the checkout mutation call to properly pass the selected payment method. Ensure successful checkout redirects to the order confirmation page with the correct order ID. Add comprehensive error handling with user-friendly error messages. Verify that the payment method radio buttons are properly wired to state updates."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review and fix the useCheckout mutation implementation to ensure it correctly calls actor.checkout() with the PaymentMethod enum value. Verify proper error handling and that the mutation returns the order ID for navigation. Ensure the mutation invalidates both 'cart' and 'orders' query keys after successful checkout to reflect the updated state."
+        },
+        {
+          "path": "frontend/src/pages/OrderConfirmation.tsx",
+          "operation": "modify",
+          "description": "Review the order confirmation page to ensure it properly receives and displays the order ID from navigation state or URL parameters. Verify that the page handles cases where order ID might be missing and provides appropriate fallback messaging. Ensure the 'Continue Shopping' button correctly navigates back to the product catalog."
+        }
+      ]
+    }
+  ]
+}
