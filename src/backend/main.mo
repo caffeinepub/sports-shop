@@ -3,9 +3,10 @@ import Nat "mo:core/Nat";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
-import Migration "migration";
+
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
 (with migration = Migration.run)
 actor {
@@ -35,12 +36,8 @@ actor {
     #cash;
   };
 
-  type Order = {
-    user : Principal;
-    items : Cart;
-    total : Nat;
-    paymentMethod : PaymentMethod;
-    status : OrderStatus;
+  public type UserProfile = {
+    name : Text;
   };
 
   type OrderStatus = {
@@ -49,8 +46,14 @@ actor {
     #cancelled;
   };
 
-  public type UserProfile = {
-    name : Text;
+  type Order = {
+    user : Principal;
+    items : Cart;
+    total : Nat;
+    paymentMethod : PaymentMethod;
+    status : OrderStatus;
+    deliveryAddress : Text;
+    customerName : Text;
   };
 
   let products = Map.empty<Nat, Product>();
@@ -168,15 +171,13 @@ actor {
           case (?existingCart) { existingCart };
         };
 
-        let updatedCart = cart.concat([
-          { productId; quantity },
-        ]);
+        let updatedCart = cart.concat([{ productId; quantity }]);
         carts.add(caller, updatedCart);
       };
     };
   };
 
-  public shared ({ caller }) func checkout(paymentMethod : PaymentMethod) : async Nat {
+  public shared ({ caller }) func checkout(paymentMethod : PaymentMethod, deliveryAddress : Text) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can checkout");
     };
@@ -199,12 +200,19 @@ actor {
       }
     );
 
+    let userProfile = switch (userProfiles.get(caller)) {
+      case (null) { Runtime.trap("User profile not found") };
+      case (?profile) { profile };
+    };
+
     let newOrder : Order = {
       user = caller;
       items = cart;
       total;
       paymentMethod;
       status = #pending;
+      deliveryAddress;
+      customerName = userProfile.name;
     };
 
     orders.add(nextOrderId, newOrder);
@@ -232,3 +240,4 @@ actor {
     orders.values().toArray();
   };
 };
+

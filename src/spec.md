@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix core e-commerce functionality including add-to-cart, product pricing, and cash-on-delivery checkout.
+**Goal:** Add admin orders dashboard to view customer orders, enable multi-admin support for partner access, and update the Vixen T.T Ball product image.
 
 **Planned changes:**
-- Debug and repair the add-to-cart functionality so products are successfully added to the cart and the header badge updates
-- Fix the Vixen T.T Ball product price to display ₹20 across all pages (catalog, cart, checkout)
-- Debug and repair the cash-on-delivery payment method selection and order completion flow
+- Create admin orders page at /admin/orders showing all orders with customer details, items, delivery address, payment method, and status
+- Add multi-admin functionality allowing current admin to grant admin privileges to other users via their Internet Identity principal
+- Update Vixen T.T Ball product image to the uploaded orange table tennis ball photo
 
-**User-visible outcome:** Users can successfully add products to their cart, see the correct ₹20 price for Vixen T.T Ball products, and complete orders using cash-on-delivery payment method.
+**User-visible outcome:** Admin users can view all customer orders in a dedicated dashboard, grant admin access to partners, and customers see the updated orange Vixen ball product image.

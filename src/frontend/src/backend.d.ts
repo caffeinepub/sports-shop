@@ -21,7 +21,9 @@ export interface CartItem {
     quantity: bigint;
 }
 export interface Order {
+    customerName: string;
     status: OrderStatus;
+    deliveryAddress: string;
     total: bigint;
     paymentMethod: PaymentMethod;
     user: Principal;
@@ -52,7 +54,7 @@ export interface backendInterface {
     addProduct(name: string, description: string, price: bigint, category: ProductCategory, stock: bigint): Promise<bigint>;
     addToCart(productId: bigint, quantity: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    checkout(paymentMethod: PaymentMethod): Promise<bigint>;
+    checkout(paymentMethod: PaymentMethod, deliveryAddress: string): Promise<bigint>;
     getAllOrders(): Promise<Array<Order>>;
     getAllProducts(): Promise<Array<Product>>;
     getCallerUserProfile(): Promise<UserProfile | null>;

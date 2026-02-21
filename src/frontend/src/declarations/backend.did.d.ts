@@ -13,7 +13,9 @@ import type { Principal } from '@icp-sdk/core/principal';
 export type Cart = Array<CartItem>;
 export interface CartItem { 'productId' : bigint, 'quantity' : bigint }
 export interface Order {
+  'customerName' : string,
   'status' : OrderStatus,
+  'deliveryAddress' : string,
   'total' : bigint,
   'paymentMethod' : PaymentMethod,
   'user' : Principal,
@@ -46,7 +48,7 @@ export interface _SERVICE {
   >,
   'addToCart' : ActorMethod<[bigint, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'checkout' : ActorMethod<[PaymentMethod], bigint>,
+  'checkout' : ActorMethod<[PaymentMethod, string], bigint>,
   'getAllOrders' : ActorMethod<[], Array<Order>>,
   'getAllProducts' : ActorMethod<[], Array<Product>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,

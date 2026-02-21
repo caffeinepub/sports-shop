@@ -32,7 +32,9 @@ export const CartItem = IDL.Record({
 });
 export const Cart = IDL.Vec(CartItem);
 export const Order = IDL.Record({
+  'customerName' : IDL.Text,
   'status' : OrderStatus,
+  'deliveryAddress' : IDL.Text,
   'total' : IDL.Nat,
   'paymentMethod' : PaymentMethod,
   'user' : IDL.Principal,
@@ -57,7 +59,7 @@ export const idlService = IDL.Service({
     ),
   'addToCart' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'checkout' : IDL.Func([PaymentMethod], [IDL.Nat], []),
+  'checkout' : IDL.Func([PaymentMethod, IDL.Text], [IDL.Nat], []),
   'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
   'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -104,7 +106,9 @@ export const idlFactory = ({ IDL }) => {
   const CartItem = IDL.Record({ 'productId' : IDL.Nat, 'quantity' : IDL.Nat });
   const Cart = IDL.Vec(CartItem);
   const Order = IDL.Record({
+    'customerName' : IDL.Text,
     'status' : OrderStatus,
+    'deliveryAddress' : IDL.Text,
     'total' : IDL.Nat,
     'paymentMethod' : PaymentMethod,
     'user' : IDL.Principal,
@@ -129,7 +133,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'addToCart' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'checkout' : IDL.Func([PaymentMethod], [IDL.Nat], []),
+    'checkout' : IDL.Func([PaymentMethod, IDL.Text], [IDL.Nat], []),
     'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
     'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),

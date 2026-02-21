@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Package, Edit, Trash2 } from 'lucide-react';
+import { Plus, Package, Edit, Trash2, ShoppingBag } from 'lucide-react';
 import { useGetAllProducts, useRemoveProduct, useIsCallerAdmin } from '../hooks/useQueries';
 import ProductForm from '../components/ProductForm';
+import AdminUserManagement from '../components/AdminUserManagement';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import AccessDeniedScreen from '../components/AccessDeniedScreen';
 import { Product, ProductCategory } from '../backend';
+import { useNavigate } from '@tanstack/react-router';
 
 export default function AdminPanel() {
+  const navigate = useNavigate();
   const { identity, isInitializing } = useInternetIdentity();
   const { data: isAdmin, isLoading: isAdminLoading } = useIsCallerAdmin();
   const { data: products, isLoading: productsLoading } = useGetAllProducts();
@@ -87,30 +90,48 @@ export default function AdminPanel() {
           <div>
             <h1 className="text-4xl font-black mb-2">Admin Panel</h1>
             <p className="text-muted-foreground">
-              Manage your product catalog
+              Manage your product catalog and admin users
             </p>
           </div>
-          <Button
-            onClick={() => setIsFormOpen(true)}
-            size="lg"
-            className="font-bold"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Add Product
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => navigate({ to: '/admin/orders' })}
+              size="lg"
+              variant="outline"
+              className="font-bold"
+            >
+              <ShoppingBag className="mr-2 h-5 w-5" />
+              View Orders
+            </Button>
+            <Button
+              onClick={() => setIsFormOpen(true)}
+              size="lg"
+              className="font-bold"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              Add Product
+            </Button>
+          </div>
         </div>
 
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Product Overview
-            </CardTitle>
-            <CardDescription>
-              {products?.length || 0} product{products?.length !== 1 ? 's' : ''} in your catalog
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Product Overview
+                </CardTitle>
+                <CardDescription>
+                  {products?.length || 0} product{products?.length !== 1 ? 's' : ''} in your catalog
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+          <div className="lg:col-span-1">
+            <AdminUserManagement />
+          </div>
+        </div>
 
         <div className="space-y-4">
           {productsLoading ? (

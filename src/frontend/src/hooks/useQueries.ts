@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { PaymentMethod, ProductCategory, UserProfile, Product as BackendProduct } from '../backend';
+import { PaymentMethod, ProductCategory, UserProfile, Product as BackendProduct, UserRole } from '../backend';
 import { Cart } from '../types';
+import { Principal } from '@dfinity/principal';
 
 export function useGetAllProducts() {
   const { actor, isFetching } = useActor();
@@ -135,9 +136,9 @@ export function useCompleteCheckout() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (paymentMethod: PaymentMethod) => {
+    mutationFn: async ({ paymentMethod, deliveryAddress }: { paymentMethod: PaymentMethod; deliveryAddress: string }) => {
       if (!actor) throw new Error('Actor not initialized');
-      return actor.checkout(paymentMethod);
+      return actor.checkout(paymentMethod, deliveryAddress);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
@@ -268,6 +269,41 @@ export function useSaveCallerUserProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+    },
+  });
+}
+
+// Orders hooks
+export function useGetAllOrders() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery({
+    queryKey: ['orders'],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return actor.getAllOrders();
+      } catch (error) {
+        console.error('Failed to fetch orders:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+// Admin role management hooks
+export function useAssignAdminRole() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (principal: Principal) => {
+      if (!actor) throw new Error('Actor not initialized');
+      return actor.assignCallerUserRole(principal, UserRole.admin);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
     },
   });
 }

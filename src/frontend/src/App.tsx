@@ -5,6 +5,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import AdminPanel from './pages/AdminPanel';
+import AdminOrders from './pages/AdminOrders';
 import StickersComingSoon from './pages/StickersComingSoon';
 
 const rootRoute = createRootRoute({
@@ -45,6 +46,12 @@ const adminRoute = createRoute({
   component: AdminPanel,
 });
 
+const adminOrdersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin/orders',
+  component: AdminOrders,
+});
+
 const stickersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/stickers',
@@ -57,6 +64,7 @@ const routeTree = rootRoute.addChildren([
   checkoutRoute,
   confirmationRoute,
   adminRoute,
+  adminOrdersRoute,
   stickersRoute,
 ]);
 

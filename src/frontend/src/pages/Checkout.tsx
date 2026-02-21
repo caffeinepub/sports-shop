@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, Banknote } from 'lucide-react';
+import { CreditCard, Banknote, MapPin } from 'lucide-react';
 import { useGetCart, useGetAllProducts, useCompleteCheckout } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { PaymentMethod } from '../backend';
@@ -14,6 +16,7 @@ import { toast } from 'sonner';
 export default function Checkout() {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<string>('cash');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { identity, login } = useInternetIdentity();
@@ -45,10 +48,20 @@ export default function Checkout() {
       return;
     }
 
+    if (!deliveryAddress.trim()) {
+      toast.error('Delivery address required', {
+        description: 'Please enter your delivery address.',
+      });
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const paymentMethodEnum = paymentMethod === 'cash' ? PaymentMethod.cash : PaymentMethod.googlePay;
-      const orderId = await completeCheckout.mutateAsync(paymentMethodEnum);
+      const orderId = await completeCheckout.mutateAsync({
+        paymentMethod: paymentMethodEnum,
+        deliveryAddress: deliveryAddress.trim(),
+      });
       toast.success('Order placed successfully!');
       navigate({ to: '/confirmation' });
     } catch (error) {
@@ -144,6 +157,31 @@ export default function Checkout() {
 
           <Card>
             <CardHeader>
+              <CardTitle className="text-2xl font-black flex items-center gap-2">
+                <MapPin className="h-6 w-6" />
+                Delivery Address
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="address">Full Address</Label>
+                <Textarea
+                  id="address"
+                  placeholder="Enter your complete delivery address including street, city, state, and PIN code"
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  rows={4}
+                  className="resize-none"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Please provide a complete address for accurate delivery
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle className="text-2xl font-black">Payment Method</CardTitle>
             </CardHeader>
             <CardContent>
@@ -186,7 +224,7 @@ export default function Checkout() {
             className="w-full font-bold text-base h-12"
             size="lg"
             onClick={handleCheckout}
-            disabled={isProcessing}
+            disabled={isProcessing || !deliveryAddress.trim()}
           >
             {isProcessing ? 'Processing...' : 'Complete Order'}
           </Button>

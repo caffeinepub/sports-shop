@@ -13,7 +13,7 @@ interface CartItemProps {
 const getProductImage = (product: Product): string => {
   // Check if this is the Vixen T.T Ball product
   if (product.name.toLowerCase().includes('vixen') && product.name.toLowerCase().includes('t.t')) {
-    return '/assets/image.png';
+    return '/assets/generated/vixen-tt-ball.dim_400x400.png';
   }
   
   // Fall back to category-based images
@@ -114,23 +114,15 @@ export default function CartItem({ item }: CartItemProps) {
                   variant="outline"
                   size="icon"
                   onClick={() => handleUpdateQuantity(Number(item.quantity) + 1)}
-                  disabled={
-                    Number(item.quantity) >= Number(item.product.stock) ||
-                    updateCartItem.isPending
-                  }
+                  disabled={Number(item.quantity) >= Number(item.product.stock) || updateCartItem.isPending}
                   className="h-8 w-8"
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
-
               <div className="text-right">
-                <div className="text-sm text-muted-foreground mb-1">
-                  ₹{Number(item.product.price)} each
-                </div>
-                <div className="text-xl font-black text-primary">
-                  ₹{subtotal}
-                </div>
+                <div className="text-sm text-muted-foreground mb-1">Subtotal</div>
+                <div className="text-xl font-black text-primary">₹{subtotal}</div>
               </div>
             </div>
           </div>

@@ -103,7 +103,9 @@ export interface CartItem {
     quantity: bigint;
 }
 export interface Order {
+    customerName: string;
     status: OrderStatus;
+    deliveryAddress: string;
     total: bigint;
     paymentMethod: PaymentMethod;
     user: Principal;
@@ -135,7 +137,7 @@ export interface backendInterface {
     addProduct(name: string, description: string, price: bigint, category: ProductCategory, stock: bigint): Promise<bigint>;
     addToCart(productId: bigint, quantity: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    checkout(paymentMethod: PaymentMethod): Promise<bigint>;
+    checkout(paymentMethod: PaymentMethod, deliveryAddress: string): Promise<bigint>;
     getAllOrders(): Promise<Array<Order>>;
     getAllProducts(): Promise<Array<Product>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -208,17 +210,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async checkout(arg0: PaymentMethod): Promise<bigint> {
+    async checkout(arg0: PaymentMethod, arg1: string): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.checkout(to_candid_PaymentMethod_n5(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.checkout(to_candid_PaymentMethod_n5(this._uploadFile, this._downloadFile, arg0), arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.checkout(to_candid_PaymentMethod_n5(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.checkout(to_candid_PaymentMethod_n5(this._uploadFile, this._downloadFile, arg0), arg1);
             return result;
         }
     }
@@ -443,20 +445,26 @@ function from_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uin
     };
 }
 function from_candid_record_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    customerName: string;
     status: _OrderStatus;
+    deliveryAddress: string;
     total: bigint;
     paymentMethod: _PaymentMethod;
     user: Principal;
     items: _Cart;
 }): {
+    customerName: string;
     status: OrderStatus;
+    deliveryAddress: string;
     total: bigint;
     paymentMethod: PaymentMethod;
     user: Principal;
     items: Cart;
 } {
     return {
+        customerName: value.customerName,
         status: from_candid_OrderStatus_n10(_uploadFile, _downloadFile, value.status),
+        deliveryAddress: value.deliveryAddress,
         total: value.total,
         paymentMethod: from_candid_PaymentMethod_n12(_uploadFile, _downloadFile, value.paymentMethod),
         user: value.user,

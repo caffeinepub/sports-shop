@@ -1,150 +1,36 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
-  "summary": "Sports shop e-commerce site for selling table tennis balls, badminton shuttles, and stickers (coming soon), with multi-admin support for collaborative management",
+  "projectStateVersion": 3,
+  "summary": "E-commerce application selling table tennis balls (₹20) with cart, cash-on-delivery, and admin order management system",
   "architectural_notes": [
-    "E-commerce focused on two initial products: table tennis balls and badminton shuttles",
-    "Target audience: friends of the shop owner",
-    "Payment methods: cash and GPay (GPay not yet implemented)",
-    "Multi-admin support required for collaborative management",
-    "Product categories: table tennis balls, badminton shuttles, stickers (coming soon)",
-    "Instagram contact feature for customer inquiries via DM",
-    "Instagram handle: itznabeastbro (https://www.instagram.com/itznabeastbro/)"
+    "Multi-admin authentication system required for partner access",
+    "Order management system with admin dashboard"
   ],
-  "known_issues": [
-    "Vixen T.T Ball product image still incorrect - should show 6 balls in cardboard/paper packaging (not the current image)",
-    "Vixen T.T Ball product displaying incorrect price (300 rupees instead of 20 rupees)",
-    "Add-to-cart functionality not working",
-    "Cash-on-delivery payment option not working",
-    "Price update to ₹20 not reflected on frontend"
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Orange Vixen table tennis ball product photo showing 'ORIGINAL Vixen T.T.F.I Approved 3 STAR' branding on an orange 40mm ball (vixen-tt-ball.dim_400x400.png)",
   "existing_features": [
     {
-      "id": "feature-create-a-product-catalog-page-displaying-table-tennis-balls-and-badminton-shuttles-with-product-images-names-descriptions-and-prices",
-      "title": "Create a product catalog page displaying table tennis balls and badminton shuttles with product images, names, descriptions, and prices",
+      "id": "feature-create-an-admin-orders-page-at-admin-orders-that-displays-all-orders-with-customer-name-items-ordered-delivery-address-payment-method-and-order-status",
+      "title": "Create an admin orders page at /admin/orders that displays all orders with customer name, items ordered, delivery address, payment method, and order status",
       "reqIds": [
-        "REQ-3"
+        "REQ-28"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-shopping-cart-functionality-allowing-users-to-add-products-view-cart-contents-update-quantities-and-remove-items",
-      "title": "Implement shopping cart functionality allowing users to add products, view cart contents, update quantities, and remove items",
+      "id": "feature-update-the-vixen-t-t-ball-product-image-to-use-the-uploaded-orange-table-tennis-ball-image-vixen-t-t-ball-top-orange-40mm-table-tennis-ball-1-webp",
+      "title": "Update the Vixen T.T Ball product image to use the uploaded orange table tennis ball image (Vixen T.T Ball Top Orange (40mm) Table Tennis Ball-1.webp)",
       "reqIds": [
-        "REQ-4"
+        "REQ-29"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-a-checkout-flow-where-users-can-review-their-order-and-complete-a-purchase",
-      "title": "Create a checkout flow where users can review their order and complete a purchase",
+      "id": "feature-add-multi-admin-support-by-allowing-the-current-admin-to-grant-admin-privileges-to-other-users-by-their-internet-identity-principal",
+      "title": "Add multi-admin support by allowing the current admin to grant admin privileges to other users by their Internet Identity principal",
       "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-render-generated-product-images-as-static-assets-in-frontend-public-assets-generated-for-table-tennis-balls-and-badminton-shuttles",
-      "title": "Render generated product images as static assets in frontend/public/assets/generated for table tennis balls and badminton shuttles",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-vibrant-energetic-visual-theme-with-sporty-colors-bright-greens-oranges-or-reds-bold-typography-and-dynamic-layouts-that-convey-athleticism-and-energy-throughout-the-entire-application",
-      "title": "Apply a vibrant, energetic visual theme with sporty colors (bright greens, oranges, or reds), bold typography, and dynamic layouts that convey athleticism and energy throughout the entire application",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-application-name-from-current-branding-to-yourdailysprtshop-across-all-frontend-components-including-the-header-logo-text-page-titles-and-footer-branding",
-      "title": "Update the application name from current branding to 'yourdailysprtshop' across all frontend components including the header logo text, page titles, and footer branding",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-payment-method-selection-to-the-checkout-page-with-two-options-cash-and-gpay-where-gpay-is-displayed-as-unavailable-disabled-with-appropriate-visual-indication",
-      "title": "Add payment method selection to the checkout page with two options: 'Cash' and 'GPay', where GPay is displayed as unavailable/disabled with appropriate visual indication",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-an-admin-panel-interface-with-authentication-that-allows-authorized-users-to-add-edit-and-remove-products-from-the-catalog-including-fields-for-product-name-description-price-category-and-stock-quantity",
-      "title": "Create an admin panel interface with authentication that allows authorized users to add, edit, and remove products from the catalog, including fields for product name, description, price, category, and stock quantity",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-separate-stickers-tab-in-the-navigation-that-displays-a-coming-soon-message-or-placeholder-indicating-this-product-category-will-be-available-in-the-future",
-      "title": "Add a separate 'Stickers' tab in the navigation that displays a 'Coming Soon' message or placeholder indicating this product category will be available in the future",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-instagram-handle-display-to-the-footer-or-contact-section-so-customers-can-find-and-dm-the-shop-owner-on-instagram",
-      "title": "Add Instagram handle display to the footer or contact section so customers can find and DM the shop owner on Instagram",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-instagram-handle-displayed-in-the-footer-from-yourdailysportshop-to-itznabeastbro-and-ensure-the-link-points-to-https-www-instagram-com-itznabeastbro",
-      "title": "Update the Instagram handle displayed in the footer from '@yourdailysportshop' to '@itznabeastbro' and ensure the link points to https://www.instagram.com/itznabeastbro/",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-vixen-t-t-ball-product-image-with-the-user-provided-image-showing-the-orange-vixen-table-tennis-ball-with-yellow-packaging-ensuring-it-renders-in-the-product-catalog-and-cart",
-      "title": "Replace the Vixen T.T Ball product image with the user-provided image showing the orange Vixen table tennis ball with yellow packaging, ensuring it renders in the product catalog and cart",
-      "reqIds": [
-        "REQ-18"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-a-new-product-image-for-vixen-t-t-ball-showing-exactly-6-orange-table-tennis-balls-in-cardboard-or-paper-packaging-to-replace-the-current-incorrect-image",
-      "title": "Generate a new product image for Vixen T.T Ball showing exactly 6 orange table tennis balls in cardboard or paper packaging to replace the current incorrect image",
-      "reqIds": [
-        "REQ-21"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-vixen-t-t-ball-product-image-with-the-user-provided-image-showing-the-orange-vixen-table-tennis-ball-in-yellow-packaging-ensuring-it-renders-correctly-in-the-product-catalog-and-shopping-cart",
-      "title": "Replace the Vixen T.T Ball product image with the user-provided image showing the orange Vixen table tennis ball in yellow packaging, ensuring it renders correctly in the product catalog and shopping cart",
-      "reqIds": [
-        "REQ-22"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-debug-and-fix-the-add-to-cart-functionality-so-that-when-users-click-the-add-to-cart-button-on-any-product-card-the-product-is-successfully-added-to-their-shopping-cart-and-the-cart-item-count-badge-updates-in-the-header-navigation",
-      "title": "Debug and fix the add-to-cart functionality so that when users click the 'Add to Cart' button on any product card, the product is successfully added to their shopping cart and the cart item count badge updates in the header navigation",
-      "reqIds": [
-        "REQ-25"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-debug-and-fix-the-cash-on-delivery-payment-method-selection-and-order-completion-flow-so-that-users-can-successfully-select-cash-as-payment-method-and-complete-their-checkout",
-      "title": "Debug and fix the cash-on-delivery payment method selection and order completion flow so that users can successfully select 'Cash' as payment method and complete their checkout",
-      "reqIds": [
-        "REQ-27"
+        "REQ-30"
       ],
       "version": 1
     }
@@ -152,143 +38,30 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Display products (table tennis balls and badminton shuttles)",
+      "summary": "Add admin orders page to view all incoming orders with customer details",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Shopping cart functionality",
+      "summary": "Add real-time notifications for new orders",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Checkout and purchase process",
+      "summary": "Update product image for table tennis ball",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Create a backend data model to store product information including name, description, price, category (table tennis balls or badminton shuttles), and stock quantity",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Implement backend functions to list all available products and retrieve individual product details",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Support multiple payment methods: cash and GPay (GPay currently unavailable)",
+      "summary": "Add multi-admin support to allow partner as admin",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Update backend checkout function to accept and store the selected payment method (cash or gpay) with the order",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Build an admin panel for adding, editing, and removing products",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-11",
-      "summary": "Support multiple admin users (for owner and friend)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-12",
-      "summary": "Add a separate 'Stickers' product category tab (marked as coming soon)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-14",
-      "summary": "Implement multi-admin support in the backend to allow multiple authorized users (owner and friend) to manage the shop, storing admin identities and verifying permissions for product management operations",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Display Instagram handle so customers can DM the shop owner",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-16",
-      "summary": "Add a new product to the catalog with the following details: Name: 'Vixen T.T Ball Top Orange (40mm) Table Tennis Ball', Category: 'Table Tennis Balls', Price: 15 rupees per ball, with appropriate stock quantity",
-      "reqIds": [
-        "REQ-16"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-17",
-      "summary": "Update the Vixen T.T Ball Top Orange (40mm) Table Tennis Ball product price from dollars to ₹20 (20 rupees) in the backend product data",
-      "reqIds": [
-        "REQ-17"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-18",
-      "summary": "Update the Vixen T.T Ball product price in the backend from its current value to exactly 20 (representing ₹20 per ball), ensuring the price is stored as a Nat type and displays correctly throughout the application",
-      "reqIds": [
-        "REQ-19"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-19",
-      "summary": "Replace the current Vixen T.T Ball product image with the user-provided image showing the orange Vixen table tennis ball with yellow packaging across all frontend components including ProductCard and CartItem",
-      "reqIds": [
-        "REQ-20"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-21",
-      "summary": "Update the Vixen T.T Ball product price from ₹300 to ₹20 in the backend product data",
-      "reqIds": [
-        "REQ-23"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-22",
-      "summary": "Update the Vixen T.T Ball product price in the backend from 300 to 20 (representing ₹20 per ball), ensuring the price is stored as a Nat type and the change persists across deployments",
-      "reqIds": [
-        "REQ-24"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-24",
-      "summary": "Fix the Vixen T.T Ball product price display to show ₹20 instead of the current incorrect price throughout the application including the product catalog, cart, and checkout pages",
-      "reqIds": [
-        "REQ-26"
-      ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "Sports Shop",
+  "projectName": "Your Daily Sport Shop",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -15,7 +15,7 @@ interface ProductCardProps {
 const getProductImage = (product: Product): string => {
   // Check if this is the Vixen T.T Ball product
   if (product.name.toLowerCase().includes('vixen') && product.name.toLowerCase().includes('t.t')) {
-    return '/assets/image.png';
+    return '/assets/generated/vixen-tt-ball.dim_400x400.png';
   }
   
   // Fall back to category-based images
