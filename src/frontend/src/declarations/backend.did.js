@@ -53,8 +53,8 @@ export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addProduct' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Nat, ProductCategory, IDL.Nat],
-      [IDL.Nat],
+      [IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
+      [IDL.Opt(IDL.Nat)],
       [],
     ),
   'addToCart' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
@@ -76,7 +76,7 @@ export const idlService = IDL.Service({
   'removeProduct' : IDL.Func([IDL.Nat], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'updateProduct' : IDL.Func(
-      [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, ProductCategory, IDL.Nat],
+      [IDL.Nat, IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
       [],
       [],
     ),
@@ -127,8 +127,8 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addProduct' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Nat, ProductCategory, IDL.Nat],
-        [IDL.Nat],
+        [IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
+        [IDL.Opt(IDL.Nat)],
         [],
       ),
     'addToCart' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
@@ -150,7 +150,7 @@ export const idlFactory = ({ IDL }) => {
     'removeProduct' : IDL.Func([IDL.Nat], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'updateProduct' : IDL.Func(
-        [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, ProductCategory, IDL.Nat],
+        [IDL.Nat, IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
         [],
         [],
       ),

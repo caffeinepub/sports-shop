@@ -18,7 +18,6 @@ interface ProductFormProps {
 export default function ProductForm({ product, onClose }: ProductFormProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
   const [category, setCategory] = useState<'tableTennisBalls' | 'badmintonShuttles'>('tableTennisBalls');
   const [stock, setStock] = useState('');
 
@@ -32,7 +31,6 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
     if (product) {
       setName(product.name);
       setDescription(product.description);
-      setPrice(product.price.toString());
       setStock(product.stock.toString());
       
       // ProductCategory is an enum, compare directly
@@ -56,11 +54,6 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
       toast.error('Product description is required');
       return;
     }
-    const priceNum = parseFloat(price);
-    if (isNaN(priceNum) || priceNum <= 0) {
-      toast.error('Please enter a valid price');
-      return;
-    }
     const stockNum = parseInt(stock);
     if (isNaN(stockNum) || stockNum < 0) {
       toast.error('Please enter a valid stock quantity');
@@ -79,7 +72,6 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
           productId: product.id,
           name: name.trim(),
           description: description.trim(),
-          price: priceNum,
           category: categoryEnum,
           stock: BigInt(stockNum),
         });
@@ -88,7 +80,6 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
         await addProduct.mutateAsync({
           name: name.trim(),
           description: description.trim(),
-          price: priceNum,
           category: categoryEnum,
           stock: BigInt(stockNum),
         });
@@ -130,14 +121,12 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
           <Label htmlFor="price">Price (₹)</Label>
           <Input
             id="price"
-            type="number"
-            step="0.01"
-            min="0"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="0.00"
-            disabled={isSubmitting}
+            type="text"
+            value="20"
+            disabled
+            className="bg-muted"
           />
+          <p className="text-xs text-muted-foreground">Price is fixed at ₹20 for all products</p>
         </div>
 
         <div className="space-y-2">

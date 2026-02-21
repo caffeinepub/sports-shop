@@ -43,8 +43,8 @@ export type UserRole = { 'admin' : null } |
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addProduct' : ActorMethod<
-    [string, string, bigint, ProductCategory, bigint],
-    bigint
+    [string, string, ProductCategory, bigint],
+    [] | [bigint]
   >,
   'addToCart' : ActorMethod<[bigint, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
@@ -61,7 +61,7 @@ export interface _SERVICE {
   'removeProduct' : ActorMethod<[bigint], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'updateProduct' : ActorMethod<
-    [bigint, string, string, bigint, ProductCategory, bigint],
+    [bigint, string, string, ProductCategory, bigint],
     undefined
   >,
 }

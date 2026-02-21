@@ -51,7 +51,7 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    addProduct(name: string, description: string, price: bigint, category: ProductCategory, stock: bigint): Promise<bigint>;
+    addProduct(name: string, description: string, category: ProductCategory, stock: bigint): Promise<bigint | null>;
     addToCart(productId: bigint, quantity: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkout(paymentMethod: PaymentMethod, deliveryAddress: string): Promise<bigint>;
@@ -66,5 +66,5 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     removeProduct(productId: bigint): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateProduct(productId: bigint, name: string, description: string, price: bigint, category: ProductCategory, stock: bigint): Promise<void>;
+    updateProduct(productId: bigint, name: string, description: string, category: ProductCategory, stock: bigint): Promise<void>;
 }

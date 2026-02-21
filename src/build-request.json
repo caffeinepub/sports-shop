@@ -1,82 +1,54 @@
 {
   "kind": "build_request",
-  "title": "Add admin orders dashboard, multi-admin support, and update product image",
-  "projectName": "Your Daily Sport Shop",
+  "title": "Change product price to ₹20",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-28",
-      "text": "Create an admin orders page at /admin/orders that displays all orders with customer name, items ordered, delivery address, payment method, and order status",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "DO BOTH",
-          "HOW TO DO I KNOW THAT SOMEONE ORDERD"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin users can navigate to /admin/orders from the admin panel",
-        "Orders page displays a list or table of all orders",
-        "Each order shows customer name, items with quantities, delivery address, payment method (cash/Google Pay), and order status",
-        "Page is accessible only to authenticated admin users",
-        "Orders are retrieved from the backend canister"
-      ]
-    },
-    {
-      "id": "REQ-29",
-      "text": "Update the Vixen T.T Ball product image to use the uploaded orange table tennis ball image (Vixen T.T Ball Top Orange (40mm) Table Tennis Ball-1.webp)",
+      "id": "REQ-1",
+      "text": "Update the product price display format to show Indian Rupees (₹) instead of the current currency symbol",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-last"
         ],
         "quotes": [
-          "update picture of tt ball to this"
+          "chnage the price to ruppes 20"
         ]
       },
       "acceptanceCriteria": [
-        "The Vixen T.T Ball product displays the orange table tennis ball image on the product catalog page",
-        "The image displays correctly in the cart when the product is added",
-        "Image is stored in frontend/public/assets/generated and referenced properly"
+        "All product prices display with ₹ symbol prefix",
+        "Price formatting is consistent across ProductCard, CartItem, Cart, and Checkout pages"
       ]
     },
     {
-      "id": "REQ-30",
-      "text": "Add multi-admin support by allowing the current admin to grant admin privileges to other users by their Internet Identity principal",
-      "target": "both",
+      "id": "REQ-2",
+      "text": "Set the default or current product price to 20 rupees (₹20)",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-last"
         ],
         "quotes": [
-          "i want to make my frnd admin too as he is partner"
+          "chnage the price to ruppes 20"
         ]
       },
       "acceptanceCriteria": [
-        "Admin panel includes a section to add new admins by entering their Internet Identity principal",
-        "Backend supports multiple admin users with role-based access control",
-        "New admins can access the admin panel and orders page",
-        "Only existing admins can grant admin privileges to others",
-        "Admin list is persisted in the backend canister"
+        "Product price is updated to 20 in the backend data model",
+        "Price displays as ₹20 in the frontend"
       ]
     }
   ],
   "constraints": [
-    "Maintain existing single-actor backend architecture in backend/main.mo",
-    "Do not modify immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui"
+    "Preserve existing product data structure and fields",
+    "Maintain price as numeric type for calculations"
   ],
   "nonGoals": [
-    "Real-time push notifications (not supported by platform)",
-    "Email notifications for orders",
-    "WebSocket-based real-time order updates"
+    "Multi-currency support",
+    "Currency conversion logic",
+    "Changing other product attributes"
   ],
   "imageRequirements": {
-    "required": [
-      "Orange Vixen table tennis ball product photo showing 'ORIGINAL Vixen T.T.F.I Approved 3 STAR' branding on an orange 40mm ball (vixen-tt-ball.dim_400x400.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

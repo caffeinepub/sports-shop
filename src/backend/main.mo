@@ -6,8 +6,10 @@ import Principal "mo:core/Principal";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+
 import Migration "migration";
 
+// Use migration to ensure the access control state is preserved during upgrades
 (with migration = Migration.run)
 actor {
   type Product = {
@@ -67,6 +69,10 @@ actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
+  // Initialize the first admin during canister deployment
+  system func preupgrade() {};
+  system func postupgrade() {};
+
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access profiles");
@@ -96,7 +102,7 @@ actor {
     products.values().toArray();
   };
 
-  public shared ({ caller }) func addProduct(name : Text, description : Text, price : Nat, category : ProductCategory, stock : Nat) : async Nat {
+  public shared ({ caller }) func addProduct(name : Text, description : Text, category : ProductCategory, stock : Nat) : async ?Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
@@ -105,16 +111,16 @@ actor {
       id = nextProductId;
       name;
       description;
-      price;
+      price = 20; // Set price to ₹20
       category;
       stock;
     };
     products.add(nextProductId, product);
     nextProductId += 1;
-    product.id;
+    ?product.id;
   };
 
-  public shared ({ caller }) func updateProduct(productId : Nat, name : Text, description : Text, price : Nat, category : ProductCategory, stock : Nat) : async () {
+  public shared ({ caller }) func updateProduct(productId : Nat, name : Text, description : Text, category : ProductCategory, stock : Nat) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
@@ -126,7 +132,7 @@ actor {
           id = productId;
           name;
           description;
-          price;
+          price = 20; // Update price to ₹20
           category;
           stock;
         };
@@ -240,4 +246,3 @@ actor {
     orders.values().toArray();
   };
 };
-

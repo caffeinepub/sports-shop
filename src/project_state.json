@@ -1,67 +1,38 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "E-commerce application selling table tennis balls (₹20) with cart, cash-on-delivery, and admin order management system",
-  "architectural_notes": [
-    "Multi-admin authentication system required for partner access",
-    "Order management system with admin dashboard"
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [
+    "Admin access not working - user principal needs to be configured properly"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Orange Vixen table tennis ball product photo showing 'ORIGINAL Vixen T.T.F.I Approved 3 STAR' branding on an orange 40mm ball (vixen-tt-ball.dim_400x400.png)",
-  "existing_features": [
-    {
-      "id": "feature-create-an-admin-orders-page-at-admin-orders-that-displays-all-orders-with-customer-name-items-ordered-delivery-address-payment-method-and-order-status",
-      "title": "Create an admin orders page at /admin/orders that displays all orders with customer name, items ordered, delivery address, payment method, and order status",
-      "reqIds": [
-        "REQ-28"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-vixen-t-t-ball-product-image-to-use-the-uploaded-orange-table-tennis-ball-image-vixen-t-t-ball-top-orange-40mm-table-tennis-ball-1-webp",
-      "title": "Update the Vixen T.T Ball product image to use the uploaded orange table tennis ball image (Vixen T.T Ball Top Orange (40mm) Table Tennis Ball-1.webp)",
-      "reqIds": [
-        "REQ-29"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-multi-admin-support-by-allowing-the-current-admin-to-grant-admin-privileges-to-other-users-by-their-internet-identity-principal",
-      "title": "Add multi-admin support by allowing the current admin to grant admin privileges to other users by their Internet Identity principal",
-      "reqIds": [
-        "REQ-30"
-      ],
-      "version": 1
-    }
-  ],
+  "isFixRequest": true,
+  "existing_features": [],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add admin orders page to view all incoming orders with customer details",
+      "summary": "Change price to rupees 20",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Add real-time notifications for new orders",
-      "reqIds": [],
+      "summary": "Update the product price display format to show Indian Rupees (₹) instead of the current currency symbol",
+      "reqIds": [
+        "REQ-1"
+      ],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Update product image for table tennis ball",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Add multi-admin support to allow partner as admin",
-      "reqIds": [],
+      "summary": "Set the default or current product price to 20 rupees (₹20)",
+      "reqIds": [
+        "REQ-2"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Your Daily Sport Shop",
+  "projectName": "Change product price to ₹20",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -1,6 +1,7 @@
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
+import AccessControl "authorization/access-control";
 
 module {
   type Product = {
@@ -17,7 +18,15 @@ module {
     quantity : Nat;
   };
 
-  type Cart = [CartItem];
+  type Order = {
+    user : Principal;
+    items : [CartItem];
+    total : Nat;
+    paymentMethod : PaymentMethod;
+    status : OrderStatus;
+    deliveryAddress : Text;
+    customerName : Text;
+  };
 
   type ProductCategory = {
     #tableTennisBalls;
@@ -39,58 +48,35 @@ module {
     #cancelled;
   };
 
-  // Old Order Type
-  type OldOrder = {
-    user : Principal;
-    items : Cart;
-    total : Nat;
-    paymentMethod : PaymentMethod;
-    status : OrderStatus;
-  };
-
-  // New Order Type with address
-  type NewOrder = {
-    user : Principal;
-    items : Cart;
-    total : Nat;
-    paymentMethod : PaymentMethod;
-    status : OrderStatus;
-    deliveryAddress : Text;
-    customerName : Text;
-  };
-
-  // Old actor type
   type OldActor = {
     products : Map.Map<Nat, Product>;
-    carts : Map.Map<Principal, Cart>;
-    orders : Map.Map<Nat, OldOrder>;
+    carts : Map.Map<Principal, [CartItem]>;
+    orders : Map.Map<Nat, Order>;
     userProfiles : Map.Map<Principal, UserProfile>;
     nextProductId : Nat;
     nextOrderId : Nat;
+    accessControlState : AccessControl.AccessControlState;
   };
 
-  // New actor type
   type NewActor = {
     products : Map.Map<Nat, Product>;
-    carts : Map.Map<Principal, Cart>;
-    orders : Map.Map<Nat, NewOrder>;
+    carts : Map.Map<Principal, [CartItem]>;
+    orders : Map.Map<Nat, Order>;
     userProfiles : Map.Map<Principal, UserProfile>;
     nextProductId : Nat;
     nextOrderId : Nat;
+    accessControlState : AccessControl.AccessControlState;
   };
 
   public func run(old : OldActor) : NewActor {
-    // Convert all old orders to new format with default delivery addresses and customer names
-    let newOrders = old.orders.map<Nat, OldOrder, NewOrder>(
-      func(_id, oldOrder) {
-        {
-          oldOrder with
-          deliveryAddress = "not provided";
-          customerName = "unknown";
-        };
+    let updatedProducts = old.products.map<Nat, Product, Product>(
+      func(_id, product) {
+        { product with price = 20 };
       }
     );
-
-    { old with orders = newOrders };
+    {
+      old with
+      products = updatedProducts;
+    };
   };
 };

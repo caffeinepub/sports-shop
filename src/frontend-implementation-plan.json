@@ -1,87 +1,35 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add admin orders dashboard, multi-admin support, and update product image",
+  "title": "Change product price to ₹20",
   "requirements": [
     {
-      "id": "REQ-28",
-      "summary": "Create admin orders page displaying all orders with customer details and status",
+      "id": "REQ-1",
+      "summary": "Update the product price display format to show Indian Rupees (₹) instead of the current currency symbol",
       "acceptanceCriteria": [
-        "Admin users can navigate to /admin/orders from the admin panel",
-        "Orders page displays a list or table of all orders",
-        "Each order shows customer name, items with quantities, delivery address, payment method (cash/Google Pay), and order status",
-        "Page is accessible only to authenticated admin users",
-        "Orders are retrieved from the backend canister"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/AdminOrders.tsx",
-          "operation": "create",
-          "description": "Create new admin orders page component that displays all orders in a table format. Show customer name, items with quantities, delivery address, payment method, and order status. Use the authorization component to verify admin access with hasPermission check for #admin role before rendering content. Retrieve orders using the getAllOrders backend method. Include loading states, error handling, and empty state messaging. Verify the authorization component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Register the new /admin/orders route in the router configuration, ensuring it is placed alongside other admin routes and requires authentication."
-        },
-        {
-          "path": "frontend/src/pages/AdminPanel.tsx",
-          "operation": "modify",
-          "description": "Add a navigation button or link to the admin orders page (/admin/orders) in the admin panel UI, allowing admins to easily access the orders dashboard."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add a new React Query hook useGetAllOrders that calls the getAllOrders backend method and returns the list of orders with proper type safety using the Order type from backend.d.ts. Include query key, error handling, and appropriate cache invalidation strategy."
-        }
-      ]
-    },
-    {
-      "id": "REQ-29",
-      "summary": "Update Vixen T.T Ball product image to use the uploaded orange table tennis ball image",
-      "acceptanceCriteria": [
-        "The Vixen T.T Ball product displays the orange table tennis ball image on the product catalog page",
-        "The image displays correctly in the cart when the product is added",
-        "Image is stored in frontend/public/assets/generated and referenced properly"
+        "All product prices display with ₹ symbol prefix",
+        "Price formatting is consistent across ProductCard, CartItem, Cart, and Checkout pages"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/ProductCard.tsx",
           "operation": "modify",
-          "description": "Update the product image mapping logic to use the generated image at frontend/public/assets/generated/vixen-tt-ball.dim_400x400.png for the Vixen T.T Ball product. Ensure the image path references the workspace file path correctly and displays the orange table tennis ball showing 'ORIGINAL Vixen T.T.F.I Approved 3 STAR' branding."
+          "description": "Update price display formatting to show ₹ symbol prefix instead of current currency format. Ensure numeric price conversion from bigint maintains precision for display as ₹XX format."
         },
         {
           "path": "frontend/src/components/CartItem.tsx",
           "operation": "modify",
-          "description": "Update the image mapping logic to use the generated image at frontend/public/assets/generated/vixen-tt-ball.dim_400x400.png for the Vixen T.T Ball product in the cart view. Replace the current image.png reference with the correct generated image path to ensure consistency across the application."
-        }
-      ]
-    },
-    {
-      "id": "REQ-30",
-      "summary": "Add multi-admin support by allowing current admin to grant admin privileges to other users",
-      "acceptanceCriteria": [
-        "Admin panel includes a section to add new admins by entering their Internet Identity principal",
-        "Backend supports multiple admin users with role-based access control",
-        "New admins can access the admin panel and orders page",
-        "Only existing admins can grant admin privileges to others",
-        "Admin list is persisted in the backend canister"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AdminUserManagement.tsx",
-          "operation": "create",
-          "description": "Create a new component for managing admin users. Include a form with input field for entering Internet Identity principal (with validation for principal format), a button to grant admin role, and display of current admin users if available. Use the authorization component's assignCallerUserRole capability through the backend interface to grant admin privileges. Include success/error feedback, loading states, and appropriate UI messaging. Verify the authorization component's usage instructions before implementing."
+          "description": "Update price and subtotal display formatting to show ₹ symbol prefix for both individual product price and calculated subtotal. Maintain existing bigint conversion logic while changing currency symbol."
         },
         {
-          "path": "frontend/src/pages/AdminPanel.tsx",
+          "path": "frontend/src/pages/Cart.tsx",
           "operation": "modify",
-          "description": "Integrate the AdminUserManagement component into the admin panel page, placing it in a dedicated section for user management. Ensure it is visible only to authenticated admin users."
+          "description": "Update order summary total price display to show ₹ symbol prefix in the cart summary section. Ensure consistency with other price displays."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/pages/Checkout.tsx",
           "operation": "modify",
-          "description": "Add a new mutation hook useAssignAdminRole that calls the assignCallerUserRole backend method with the provided principal and admin role. Include proper error handling, success feedback, and query invalidation for any cached user role data. Accept principal string as parameter and convert to Principal type before calling backend."
+          "description": "Update order summary and total price display in checkout page to show ₹ symbol prefix. Apply formatting consistently to all price displays in the order summary section."
         }
       ]
     }

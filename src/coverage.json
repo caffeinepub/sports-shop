@@ -1,59 +1,33 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T08:28:10.689Z",
+  "generatedAt": "2026-02-21T09:30:43.991Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 0,
     "items": [
       {
-        "id": "REQ-28",
-        "summary": "Create an admin orders page at /admin/orders that displays all orders with customer name, items ordered, delivery address, payment method, and order status",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/AdminOrders.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/AdminOrders.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-29",
-        "summary": "Update the Vixen T.T Ball product image to use the uploaded orange table tennis ball image (Vixen T.T Ball Top Orange (40mm) Table Tennis Ball-1.webp)",
-        "status": "implemented",
+        "id": "REQ-1",
+        "summary": "Update the product price display format to show Indian Rupees (₹) instead of the current currency symbol",
+        "status": "missing",
         "plannedFiles": [
           "frontend/src/components/ProductCard.tsx",
-          "frontend/src/components/CartItem.tsx"
+          "frontend/src/components/CartItem.tsx",
+          "frontend/src/pages/Cart.tsx",
+          "frontend/src/pages/Checkout.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/components/ProductCard.tsx",
-          "frontend/src/components/CartItem.tsx"
-        ]
+        "matchedFiles": []
       },
       {
-        "id": "REQ-30",
-        "summary": "Add multi-admin support by allowing the current admin to grant admin privileges to other users by their Internet Identity principal",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/AdminUserManagement.tsx",
-          "frontend/src/pages/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/AdminUserManagement.tsx",
-          "frontend/src/pages/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
+        "id": "REQ-2",
+        "summary": "Set the default or current product price to 20 rupees (₹20)",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
@@ -64,19 +38,12 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/vixen-tt-ball.dim_400x400.png",
-    "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/AdminUserManagement.tsx",
-    "frontend/src/components/CartItem.tsx",
-    "frontend/src/components/ProductCard.tsx",
+    "frontend/src/components/ProductForm.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/AdminOrders.tsx",
-    "frontend/src/pages/AdminPanel.tsx",
-    "frontend/src/pages/Checkout.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

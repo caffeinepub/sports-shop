@@ -7,6 +7,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { SiFacebook, SiInstagram, SiX } from 'react-icons/si';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -18,6 +19,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const cartItemCount = cart?.reduce((sum, item) => sum + Number(item.quantity), 0) || 0;
   const isAuthenticated = !!identity;
   const isLoggingIn = loginStatus === 'logging-in';
+
+  // Debug logging for identity changes
+  useEffect(() => {
+    if (identity) {
+      const principal = identity.getPrincipal().toString();
+      const timestamp = new Date().toISOString();
+      console.log('=== Layout Identity Info ===', timestamp);
+      console.log('User Principal:', principal);
+      console.log('Is Authenticated:', isAuthenticated);
+      console.log('===========================');
+    }
+  }, [identity, isAuthenticated]);
 
   const handleAuth = async () => {
     if (isAuthenticated) {

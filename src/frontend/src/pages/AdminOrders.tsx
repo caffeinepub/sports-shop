@@ -6,6 +6,7 @@ import { useGetAllOrders, useIsCallerAdmin, useGetAllProducts } from '../hooks/u
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import AccessDeniedScreen from '../components/AccessDeniedScreen';
 import { Order, OrderStatus, PaymentMethod } from '../backend';
+import { useEffect } from 'react';
 
 export default function AdminOrders() {
   const { identity, isInitializing } = useInternetIdentity();
@@ -15,6 +16,19 @@ export default function AdminOrders() {
 
   const isAuthenticated = !!identity;
   const isLoading = isInitializing || isAdminLoading || ordersLoading;
+
+  // Debug logging
+  useEffect(() => {
+    const timestamp = new Date().toISOString();
+    console.log('=== AdminOrders Debug Info ===', timestamp);
+    console.log('isInitializing:', isInitializing);
+    console.log('isAuthenticated:', isAuthenticated);
+    console.log('identity:', identity ? identity.getPrincipal().toString() : 'null');
+    console.log('isAdminLoading:', isAdminLoading);
+    console.log('isAdmin:', isAdmin);
+    console.log('Will show AccessDeniedScreen:', !isAuthenticated || !isAdmin);
+    console.log('==============================');
+  }, [isInitializing, isAuthenticated, identity, isAdminLoading, isAdmin]);
 
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {

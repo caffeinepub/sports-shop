@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { CreditCard, Banknote, MapPin } from 'lucide-react';
-import { useGetCart, useGetAllProducts, useCompleteCheckout } from '../hooks/useQueries';
+import { useGetCart, useGetAllProducts, useCheckout } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { PaymentMethod } from '../backend';
 import { toast } from 'sonner';
@@ -23,7 +23,7 @@ export default function Checkout() {
   const isAuthenticated = !!identity;
   const { data: cart, isLoading: cartLoading } = useGetCart();
   const { data: products, isLoading: productsLoading } = useGetAllProducts();
-  const completeCheckout = useCompleteCheckout();
+  const completeCheckout = useCheckout();
 
   const isLoading = cartLoading || productsLoading;
 

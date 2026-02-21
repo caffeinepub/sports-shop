@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add admin orders dashboard to view customer orders, enable multi-admin support for partner access, and update the Vixen T.T Ball product image.
+**Goal:** Update product pricing to display in Indian Rupees (₹) with a price of ₹20.
 
 **Planned changes:**
-- Create admin orders page at /admin/orders showing all orders with customer details, items, delivery address, payment method, and status
-- Add multi-admin functionality allowing current admin to grant admin privileges to other users via their Internet Identity principal
-- Update Vixen T.T Ball product image to the uploaded orange table tennis ball photo
+- Change currency symbol from current format to ₹ (Indian Rupees) across all price displays
+- Update product price to 20 rupees in the backend
+- Ensure consistent ₹20 formatting in ProductCard, CartItem, Cart, and Checkout pages
 
-**User-visible outcome:** Admin users can view all customer orders in a dedicated dashboard, grant admin access to partners, and customers see the updated orange Vixen ball product image.
+**User-visible outcome:** All product prices will display as ₹20 with the Indian Rupee symbol throughout the application.
