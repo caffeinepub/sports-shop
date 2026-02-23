@@ -1,82 +1,54 @@
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
-import AccessControl "authorization/access-control";
+import Storage "blob-storage/Storage";
 
 module {
-  type Product = {
+  // Old types
+  type OldCustomSticker = {
     id : Nat;
-    name : Text;
-    description : Text;
+    creator : Principal;
+    image : Storage.ExternalBlob;
     price : Nat;
-    category : ProductCategory;
-    stock : Nat;
-  };
-
-  type CartItem = {
-    productId : Nat;
-    quantity : Nat;
-  };
-
-  type Order = {
-    user : Principal;
-    items : [CartItem];
-    total : Nat;
-    paymentMethod : PaymentMethod;
-    status : OrderStatus;
-    deliveryAddress : Text;
-    customerName : Text;
-  };
-
-  type ProductCategory = {
-    #tableTennisBalls;
-    #badmintonShuttles;
-  };
-
-  type PaymentMethod = {
-    #googlePay;
-    #cash;
-  };
-
-  type UserProfile = {
     name : Text;
-  };
-
-  type OrderStatus = {
-    #pending;
-    #completed;
-    #cancelled;
+    description : ?Text;
   };
 
   type OldActor = {
-    products : Map.Map<Nat, Product>;
-    carts : Map.Map<Principal, [CartItem]>;
-    orders : Map.Map<Nat, Order>;
-    userProfiles : Map.Map<Principal, UserProfile>;
-    nextProductId : Nat;
-    nextOrderId : Nat;
-    accessControlState : AccessControl.AccessControlState;
+    customStickers : Map.Map<Nat, OldCustomSticker>;
+  };
+
+  // New actor type
+  type NewCustomSticker = {
+    id : Nat;
+    creator : Principal;
+    image : Storage.ExternalBlob;
+    price : Nat;
+    name : Text;
+    category : {
+      #sports;
+      #animals;
+      #food;
+      #cartoon;
+      #patterns;
+    };
+    description : ?Text;
   };
 
   type NewActor = {
-    products : Map.Map<Nat, Product>;
-    carts : Map.Map<Principal, [CartItem]>;
-    orders : Map.Map<Nat, Order>;
-    userProfiles : Map.Map<Principal, UserProfile>;
-    nextProductId : Nat;
-    nextOrderId : Nat;
-    accessControlState : AccessControl.AccessControlState;
+    customStickers : Map.Map<Nat, NewCustomSticker>;
   };
 
+  // Migration function called by the actor via the with clause
   public func run(old : OldActor) : NewActor {
-    let updatedProducts = old.products.map<Nat, Product, Product>(
-      func(_id, product) {
-        { product with price = 20 };
+    let newCustomStickers = old.customStickers.map<Nat, OldCustomSticker, NewCustomSticker>(
+      func(_id, oldCustomSticker) {
+        {
+          oldCustomSticker with
+          category = #sports;
+        };
       }
     );
-    {
-      old with
-      products = updatedProducts;
-    };
+    { customStickers = newCustomStickers };
   };
 };

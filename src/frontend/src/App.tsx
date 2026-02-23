@@ -6,7 +6,7 @@ import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import AdminPanel from './pages/AdminPanel';
 import AdminOrders from './pages/AdminOrders';
-import StickersComingSoon from './pages/StickersComingSoon';
+import Stickers from './pages/Stickers';
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -55,7 +55,7 @@ const adminOrdersRoute = createRoute({
 const stickersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/stickers',
-  component: StickersComingSoon,
+  component: Stickers,
 });
 
 const routeTree = rootRoute.addChildren([

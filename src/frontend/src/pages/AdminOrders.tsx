@@ -1,11 +1,48 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Package, MapPin, CreditCard, User } from 'lucide-react';
-import { useGetAllOrders, useIsCallerAdmin } from '../hooks/useQueries';
+import { useGetAllOrders, useIsCallerAdmin, useGetProduct, useGetCustomSticker } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import AccessDeniedScreen from '../components/AccessDeniedScreen';
 import { Order, OrderStatus, PaymentMethod } from '../backend';
 import { useEffect } from 'react';
+
+function OrderItemDisplay({ productId }: { productId: bigint }) {
+  const { data: product } = useGetProduct(productId);
+  const { data: customSticker } = useGetCustomSticker(productId);
+
+  if (customSticker) {
+    return (
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded overflow-hidden bg-muted/30 flex-shrink-0">
+          <img
+            src={customSticker.image.getDirectURL()}
+            alt={customSticker.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex-1">
+          <p className="font-semibold">{customSticker.name}</p>
+          <p className="text-xs text-primary">Custom Sticker</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (product) {
+    return (
+      <div className="flex-1">
+        <p className="font-semibold">{product.name}</p>
+      </div>
+    );
+  }
+
+  return (
+    <span className="text-muted-foreground">
+      Product ID: {productId.toString()}
+    </span>
+  );
+}
 
 export default function AdminOrders() {
   const { identity, isInitializing } = useInternetIdentity();
@@ -151,15 +188,10 @@ export default function AdminOrders() {
                     <div className="space-y-2">
                       {order.items.map((item, itemIndex) => (
                         <div key={itemIndex} className="flex justify-between items-center text-sm bg-muted/30 p-3 rounded-lg">
-                          <span className="text-muted-foreground">
-                            Product ID: {item.productId.toString()}
-                          </span>
+                          <OrderItemDisplay productId={item.productId} />
                           <div className="flex items-center gap-4">
                             <span className="text-muted-foreground">
                               Qty: <span className="font-semibold text-foreground">{Number(item.quantity)}</span>
-                            </span>
-                            <span className="font-semibold text-primary">
-                              ₹{Number(item.quantity) * 20}
                             </span>
                           </div>
                         </div>
@@ -170,7 +202,7 @@ export default function AdminOrders() {
                   <div className="border-t pt-4 flex justify-between items-center">
                     <span className="text-lg font-bold">Total Amount</span>
                     <span className="text-2xl font-black text-primary">
-                      ₹{Number(order.total)}
+                      ₹{(Number(order.total) / 100).toFixed(2)}
                     </span>
                   </div>
                 </CardContent>

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { PaymentMethod, ProductCategory, UserProfile, Product as BackendProduct, UserRole } from '../backend';
+import { PaymentMethod, ProductCategory, UserProfile, Product as BackendProduct, UserRole, CustomSticker, ExternalBlob, StickerCategory } from '../backend';
 import { Cart } from '../types';
 import { Principal } from '@dfinity/principal';
 import { useInternetIdentity } from './useInternetIdentity';
@@ -268,6 +268,85 @@ export function useAssignAdminRole() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
+    },
+  });
+}
+
+// Custom Sticker Queries
+
+export function useGetCallerCustomStickers() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<CustomSticker[]>({
+    queryKey: ['callerCustomStickers'],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        const stickers = await actor.getCallerCustomStickers();
+        console.log('[useGetCallerCustomStickers] Fetched stickers:', {
+          count: stickers.length,
+          stickers: stickers.map(s => ({
+            id: s.id.toString(),
+            name: s.name,
+            category: s.category,
+            price: s.price.toString(),
+          })),
+        });
+        return stickers;
+      } catch (error) {
+        console.error('[useGetCallerCustomStickers] Error:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetCustomSticker(stickerId: bigint) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<CustomSticker | null>({
+    queryKey: ['customSticker', stickerId.toString()],
+    queryFn: async () => {
+      if (!actor) return null;
+      const sticker = await actor.getCustomSticker(stickerId);
+      if (sticker) {
+        console.log('[useGetCustomSticker] Fetched sticker:', {
+          id: sticker.id.toString(),
+          name: sticker.name,
+          category: sticker.category,
+          price: sticker.price.toString(),
+        });
+      }
+      return sticker;
+    },
+    enabled: !!actor && !isFetching && stickerId !== undefined,
+  });
+}
+
+export function useCreateCustomSticker() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ image, price, name, category, description }: { image: ExternalBlob; price: bigint; name: string; category: StickerCategory; description: string | null }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      console.log('[useCreateCustomSticker] Creating sticker with:', {
+        name,
+        category,
+        price: price.toString(),
+      });
+      const result = await actor.createCustomSticker(image, price, name, category, description);
+      console.log('[useCreateCustomSticker] Backend returned sticker:', {
+        id: result.id.toString(),
+        name: result.name,
+        category: result.category,
+        price: result.price.toString(),
+      });
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['callerCustomStickers'] });
     },
   });
 }

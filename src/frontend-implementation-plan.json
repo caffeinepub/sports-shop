@@ -1,84 +1,65 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix admin panel access and product display issues",
+  "title": "Fix custom prices for sports stickers",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix admin panel access issue preventing navigation to /admin route",
+      "summary": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
       "acceptanceCriteria": [
-        "Admin users can successfully navigate to and view the admin panel",
-        "Non-admin users see the appropriate access denied screen",
-        "Navigation to /admin route works without errors"
+        "Custom prices can be set for sports stickers in the custom sticker creation form",
+        "Custom prices are saved correctly to the backend for sports stickers",
+        "Custom prices display correctly in the stickers gallery for sports items",
+        "Custom prices appear correctly in the cart for sports stickers",
+        "Price conversion between rupees (frontend display) and paise (backend storage) works correctly for sports stickers"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminPanel.tsx",
+          "path": "frontend/src/components/CustomStickerForm.tsx",
           "operation": "modify",
-          "description": "Debug and fix the admin panel access logic by reviewing the authentication and authorization checks. Ensure the useGetCallerUserRole and useIsCallerAdmin hooks are properly fetching data before rendering access control decisions. Add proper loading states to prevent premature access denial. Verify the AccessDeniedScreen is only shown after role checks complete."
+          "description": "Review and fix the price conversion logic to ensure custom prices are properly converted from rupees to paise (multiply by 100) before submission to the backend for all categories including sports stickers. Verify that the price input accepts decimal values and the conversion applies consistently to both table tennis and badminton categories in the sports category."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/CustomStickerCard.tsx",
           "operation": "modify",
-          "description": "Review and fix the useGetCallerUserRole and useIsCallerAdmin query hooks to ensure they properly handle the actor dependency and return correct loading states. Ensure queries are enabled only when actor is available and not fetching. Add proper error handling and retry logic for authorization queries."
+          "description": "Review and fix the price display logic to ensure stored prices in paise are correctly converted to rupees (divide by 100) for display with proper decimal formatting and currency symbol (₹). Ensure the conversion works consistently for all categories including sports stickers (table tennis and badminton)."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/CartItem.tsx",
           "operation": "modify",
-          "description": "Verify the /admin route is correctly registered in the router configuration and that the AdminPanel component is properly imported and mounted. Ensure no route guards are blocking access before the component renders."
+          "description": "Review and verify the price display logic for custom stickers in the cart to ensure prices stored in paise are correctly converted to rupees for display. Fix any inconsistencies in price formatting for sports category stickers, ensuring proper decimal formatting and currency symbol display."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Fix product catalog display showing no products despite backend data existing",
+      "summary": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
       "acceptanceCriteria": [
-        "All products stored in the backend are visible on the product catalog page",
-        "Product cards display correctly with images, names, prices, and add-to-cart buttons",
-        "Loading and error states are handled appropriately",
-        "If no products exist in the database, an appropriate empty state is shown rather than appearing broken"
+        "Price input in CustomStickerForm accepts decimal values for rupees",
+        "Price conversion multiplies by 100 to convert rupees to paise before backend submission",
+        "Conversion logic works consistently for both table tennis and badminton categories"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ProductCatalog.tsx",
+          "path": "frontend/src/components/CustomStickerForm.tsx",
           "operation": "modify",
-          "description": "Debug and fix the product display logic by reviewing how the useGetProducts query hook is being used. Ensure the query is properly enabled after the actor is available, and that the products data is correctly mapped to ProductCard components. Add console logging to inspect the raw products data returned from the backend. Verify the loading, error, and empty states are rendering correctly. Ensure the grid layout properly displays product cards when data is available."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Review and fix the useGetProducts query hook to ensure it properly fetches products from the backend. Verify the query is enabled only when the actor is available and not fetching. Check that the queryFn correctly calls actor.getProducts() and returns the result without transformation errors. Add proper error handling and logging to help diagnose data fetching issues."
-        },
-        {
-          "path": "frontend/src/components/ProductCard.tsx",
-          "operation": "modify",
-          "description": "Review the ProductCard component to ensure it correctly receives and displays product data including name, description, price, stock, and category. Verify the product image mapping logic correctly handles all ProductCategory enum values and maps to the correct generated image assets in frontend/public/assets/generated/. Ensure bigint values for price and stock are properly converted to numbers for display."
+          "description": "Verify the price input field accepts decimal values and ensure the conversion logic multiplies the input value by 100 to convert rupees to paise before calling createCustomSticker. Add validation to ensure the conversion applies consistently regardless of the selected category, including both table tennis and badminton under the sports category."
         }
       ]
     },
     {
-      "id": "REQ-3",
-      "summary": "Verify backend getProducts query returns data correctly and investigate frontend-backend data fetching issues",
+      "id": "REQ-4",
+      "summary": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
       "acceptanceCriteria": [
-        "Backend getProducts() method successfully returns all stored products",
-        "Frontend useProducts query hook correctly fetches and processes the product data",
-        "Any query errors are properly logged and displayed to aid debugging"
+        "Prices display with proper decimal formatting (divided by 100)",
+        "Currency symbol (₹) appears correctly",
+        "Price display is consistent for both table tennis and badminton stickers"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/CustomStickerCard.tsx",
           "operation": "modify",
-          "description": "Add comprehensive error logging to the useGetProducts query hook to capture and display any errors during the backend call. Log the raw response data, actor state, and authentication status to help diagnose communication issues. Ensure the query properly handles cases where the backend returns an empty array versus returning an error."
-        },
-        {
-          "path": "frontend/src/hooks/useActor.ts",
-          "operation": "modify",
-          "description": "Review the actor initialization logic to ensure the backend connection is properly established before queries execute. Add logging to track actor creation, authentication state changes, and any connection errors. Verify that query invalidation and refetching work correctly when the actor state changes."
-        },
-        {
-          "path": "frontend/src/pages/ProductCatalog.tsx",
-          "operation": "modify",
-          "description": "Add detailed error display to the ProductCatalog page that shows specific error messages from the backend query. Include debugging information such as authentication status, actor availability, and query state to help identify whether the issue is with data fetching, data processing, or rendering. Display this information in development mode to aid troubleshooting."
+          "description": "Verify the price display logic divides the stored paise value by 100 to convert to rupees, formats with two decimal places, and includes the ₹ currency symbol. Ensure this conversion and formatting works consistently for all sticker categories including sports (table tennis and badminton)."
         }
       ]
     }

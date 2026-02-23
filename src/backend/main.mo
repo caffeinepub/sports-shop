@@ -2,12 +2,20 @@ import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
-import Principal "mo:core/Principal";
 import Array "mo:core/Array";
+import Principal "mo:core/Principal";
+
+import Migration "migration";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
+import Text "mo:core/Text";
+import Storage "blob-storage/Storage";
+import MixinStorage "blob-storage/Mixin";
+
+// Specify the data migration function in the with-clause
+(with migration = Migration.run)
 actor {
   type Product = {
     id : Nat;
@@ -28,6 +36,14 @@ actor {
   type ProductCategory = {
     #tableTennisBalls;
     #badmintonShuttles;
+  };
+
+  type StickerCategory = {
+    #sports;
+    #animals;
+    #food;
+    #cartoon;
+    #patterns;
   };
 
   type PaymentMethod = {
@@ -55,18 +71,32 @@ actor {
     customerName : Text;
   };
 
+  type CustomSticker = {
+    id : Nat;
+    creator : Principal;
+    image : Storage.ExternalBlob;
+    price : Nat;
+    name : Text;
+    category : StickerCategory;
+    description : ?Text;
+  };
+
   let products = Map.empty<Nat, Product>();
   let carts = Map.empty<Principal, Cart>();
   let orders = Map.empty<Nat, Order>();
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let customStickers = Map.empty<Nat, CustomSticker>();
 
   var nextProductId = 1;
   var nextOrderId = 0;
+  var nextStickerId = 0;
 
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+  include MixinStorage();
 
   system func preupgrade() {};
+
   system func postupgrade() {};
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -107,7 +137,7 @@ actor {
       id = nextProductId;
       name;
       description;
-      price = 20; // Set price to ₹20
+      price = 20;
       category;
       stock;
     };
@@ -128,7 +158,7 @@ actor {
           id = productId;
           name;
           description;
-          price = 20; // Update price to ₹20
+          price = 20;
           category;
           stock;
         };
@@ -150,8 +180,6 @@ actor {
     };
   };
 
-  // Shopping Cart Logic
-
   public query ({ caller }) func getCart() : async Cart {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access cart");
@@ -171,7 +199,6 @@ actor {
       Runtime.trap("Quantity must be greater than 0");
     };
 
-    // Validate product exists and has sufficient stock
     let product = switch (products.get(productId)) {
       case (null) { Runtime.trap("Product not found") };
       case (?p) { p };
@@ -186,7 +213,6 @@ actor {
       case (?cart) { cart };
     };
 
-    // Check if product already exists in cart
     var productExists = false;
     let updatedCart = currentCart.map(
       func(item) {
@@ -219,7 +245,6 @@ actor {
       Runtime.trap("Quantity must be greater than 0. Use removeCartItem to remove items.");
     };
 
-    // Validate product exists and has sufficient stock
     let product = switch (products.get(productId)) {
       case (null) { Runtime.trap("Product not found") };
       case (?p) { p };
@@ -281,8 +306,6 @@ actor {
     carts.remove(caller);
   };
 
-  // Checkout Logic
-
   public shared ({ caller }) func checkout(paymentMethod : PaymentMethod, deliveryAddress : Text) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can checkout");
@@ -298,7 +321,6 @@ actor {
       };
     };
 
-    // Validate stock availability for all items
     for (item in cart.vals()) {
       switch (products.get(item.productId)) {
         case (null) { Runtime.trap("Product not found: " # item.productId.toText()) };
@@ -337,7 +359,6 @@ actor {
 
     orders.add(nextOrderId, newOrder);
 
-    // Reduce stock for all items in the order
     for (item in cart.vals()) {
       switch (products.get(item.productId)) {
         case (null) {};
@@ -408,4 +429,57 @@ actor {
       };
     };
   };
+
+  public query ({ caller }) func isAdmin() : async Bool {
+    AccessControl.isAdmin(accessControlState, caller);
+  };
+
+  public shared ({ caller }) func createCustomSticker(image : Storage.ExternalBlob, price : Nat, name : Text, category : StickerCategory, description : ?Text) : async CustomSticker {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can create custom stickers");
+    };
+
+    let sticker : CustomSticker = {
+      id = nextStickerId;
+      creator = caller;
+      image;
+      price;
+      name;
+      category;
+      description;
+    };
+
+    customStickers.add(nextStickerId, sticker);
+    nextStickerId += 1;
+    sticker;
+  };
+
+  public query ({ caller }) func getCallerCustomStickers() : async [CustomSticker] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view their custom stickers");
+    };
+    customStickers.values().filter(func(sticker) { sticker.creator == caller }).toArray();
+  };
+
+  public query ({ caller }) func getCustomStickersByUser(user : Principal) : async [CustomSticker] {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own custom stickers");
+    };
+    customStickers.values().filter(func(sticker) { sticker.creator == user }).toArray();
+  };
+
+  public query ({ caller }) func getCustomSticker(stickerId : Nat) : async ?CustomSticker {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view custom stickers");
+    };
+    customStickers.get(stickerId);
+  };
+
+  public query ({ caller }) func getAllCustomStickers() : async [CustomSticker] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view custom stickers");
+    };
+    customStickers.values().toArray();
+  };
 };
+

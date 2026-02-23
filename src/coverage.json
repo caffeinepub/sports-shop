@@ -1,72 +1,74 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-23T17:33:18.606Z",
+  "generatedAt": "2026-02-23T18:33:35.766Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 4,
     "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Debug and fix the admin panel access issue preventing users from accessing the admin panel at /admin route",
+        "summary": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/App.tsx"
+          "frontend/src/components/CustomStickerForm.tsx",
+          "frontend/src/components/CustomStickerCard.tsx",
+          "frontend/src/components/CartItem.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/CustomStickerForm.tsx",
+          "frontend/src/components/CustomStickerCard.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Fix the product catalog display issue where no products are showing on the main product catalog page despite products existing in the backend",
+        "summary": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/ProductCatalog.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/ProductCard.tsx"
+          "frontend/src/components/CustomStickerForm.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/ProductCatalog.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/CustomStickerForm.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Verify that the backend getProducts query is returning products correctly and investigate any data fetching or query issues between frontend and backend",
+        "summary": "Ensure the backend CustomSticker type and createCustomSticker function properly handle and store custom prices for sports categories",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/hooks/useActor.ts",
-          "frontend/src/pages/ProductCatalog.tsx"
+          "frontend/src/components/CustomStickerCard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/ProductCatalog.tsx"
+          "frontend/src/components/CustomStickerCard.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
+    "frontend/src/components/CustomStickerCard.tsx",
+    "frontend/src/components/CustomStickerForm.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/AdminPanel.tsx",
-    "frontend/src/pages/ProductCatalog.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

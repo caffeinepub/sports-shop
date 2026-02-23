@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { ProductCategory, Product } from '../backend';
 import { CartItem as CartItemType } from '../types';
-import { useUpdateCartItem, useRemoveCartItem } from '../hooks/useQueries';
+import { useUpdateCartItem, useRemoveCartItem, useGetProduct, useGetCustomSticker } from '../hooks/useQueries';
 import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 interface CartItemProps {
-  item: CartItemType & { product: Product };
+  item: CartItemType;
 }
 
 const getProductImage = (product: Product): string => {
@@ -30,14 +31,65 @@ const getProductImage = (product: Product): string => {
 export default function CartItem({ item }: CartItemProps) {
   const updateCartItem = useUpdateCartItem();
   const removeCartItem = useRemoveCartItem();
+  
+  // Try to fetch as regular product first
+  const { data: product } = useGetProduct(item.productId);
+  // Try to fetch as custom sticker
+  const { data: customSticker } = useGetCustomSticker(item.productId);
+
+  const [itemData, setItemData] = useState<{
+    name: string;
+    description?: string;
+    price: bigint;
+    image: string;
+    stock?: bigint;
+    isCustomSticker: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (customSticker) {
+      console.log('[CartItem] Custom sticker in cart:', {
+        id: customSticker.id.toString(),
+        name: customSticker.name,
+        priceInPaise: customSticker.price.toString(),
+        priceInRupees: Number(customSticker.price) / 100,
+      });
+      setItemData({
+        name: customSticker.name,
+        description: customSticker.description || undefined,
+        price: customSticker.price,
+        image: customSticker.image.getDirectURL(),
+        isCustomSticker: true,
+      });
+    } else if (product) {
+      console.log('[CartItem] Regular product in cart:', {
+        id: product.id.toString(),
+        name: product.name,
+        priceInPaise: product.price.toString(),
+        priceInRupees: Number(product.price) / 100,
+      });
+      setItemData({
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        image: getProductImage(product),
+        stock: product.stock,
+        isCustomSticker: false,
+      });
+    }
+  }, [product, customSticker]);
 
   const handleUpdateQuantity = async (newQuantity: number) => {
     if (newQuantity < 1) return;
-    if (newQuantity > Number(item.product.stock)) {
-      toast.error('Not enough stock', {
-        description: `Only ${item.product.stock} items available.`,
-      });
-      return;
+    
+    // Check stock for regular products
+    if (itemData && !itemData.isCustomSticker && itemData.stock !== undefined) {
+      if (newQuantity > Number(itemData.stock)) {
+        toast.error('Not enough stock', {
+          description: `Only ${itemData.stock} items available.`,
+        });
+        return;
+      }
     }
 
     try {
@@ -63,69 +115,83 @@ export default function CartItem({ item }: CartItemProps) {
     }
   };
 
-  const subtotal = Number(item.product.price) * Number(item.quantity);
+  if (!itemData) {
+    return (
+      <Card className="animate-pulse">
+        <CardContent className="p-6">
+          <div className="flex gap-6">
+            <div className="w-24 h-24 rounded-lg bg-muted" />
+            <div className="flex-1">
+              <div className="h-6 bg-muted rounded w-3/4 mb-2" />
+              <div className="h-4 bg-muted rounded w-1/2" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const quantity = Number(item.quantity);
+  const price = Number(itemData.price);
+  const subtotal = (price * quantity) / 100; // Convert paise to rupees
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card>
       <CardContent className="p-6">
         <div className="flex gap-6">
           <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted/30 flex-shrink-0">
             <img
-              src={getProductImage(item.product)}
-              alt={item.product.name}
+              src={itemData.image}
+              alt={itemData.name}
               className="w-full h-full object-cover"
             />
           </div>
-
           <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <h3 className="font-bold text-lg mb-1">{item.product.name}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-1">
-                  {item.product.description}
-                </p>
+            <h3 className="font-bold text-lg mb-1 truncate">{itemData.name}</h3>
+            {itemData.description && (
+              <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
+                {itemData.description}
+              </p>
+            )}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="text-lg font-bold text-primary">
+                ₹{(price / 100).toFixed(2)}
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleRemove}
-                disabled={removeCartItem.isPending}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between mt-4">
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => handleUpdateQuantity(Number(item.quantity) - 1)}
-                  disabled={Number(item.quantity) <= 1 || updateCartItem.isPending}
                   className="h-8 w-8"
+                  onClick={() => handleUpdateQuantity(quantity - 1)}
+                  disabled={quantity <= 1 || updateCartItem.isPending}
                 >
-                  <Minus className="h-3 w-3" />
+                  <Minus className="h-4 w-4" />
                 </Button>
-                <span className="font-bold text-lg w-12 text-center">
-                  {Number(item.quantity)}
-                </span>
+                <span className="w-12 text-center font-semibold">{quantity}</span>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => handleUpdateQuantity(Number(item.quantity) + 1)}
-                  disabled={Number(item.quantity) >= Number(item.product.stock) || updateCartItem.isPending}
                   className="h-8 w-8"
+                  onClick={() => handleUpdateQuantity(quantity + 1)}
+                  disabled={updateCartItem.isPending}
                 >
-                  <Plus className="h-3 w-3" />
+                  <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="text-right">
-                <div className="text-sm text-muted-foreground mb-1">Subtotal</div>
-                <div className="text-xl font-black text-primary">₹{subtotal}</div>
+              <div className="text-lg font-bold ml-auto">
+                ₹{subtotal.toFixed(2)}
               </div>
             </div>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={handleRemove}
+            disabled={removeCartItem.isPending}
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
         </div>
       </CardContent>
     </Card>

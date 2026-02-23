@@ -1,73 +1,84 @@
 {
   "kind": "build_request",
-  "title": "Fix admin panel access and product display issues",
+  "title": "Fix custom prices for sports stickers",
+  "projectName": "Daily Sports Shop",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Debug and fix the admin panel access issue preventing users from accessing the admin panel at /admin route",
-      "target": "frontend",
+      "text": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-latest"
         ],
         "quotes": [
-          "i cant accses admin panel"
+          "stickers is good but for sports i cant make custom prices"
         ]
       },
       "acceptanceCriteria": [
-        "Admin users can successfully navigate to and view the admin panel",
-        "Non-admin users see the appropriate access denied screen",
-        "Navigation to /admin route works without errors"
+        "Custom prices can be set for sports stickers in the custom sticker creation form",
+        "Custom prices are saved correctly to the backend for sports stickers",
+        "Custom prices display correctly in the stickers gallery for sports items",
+        "Custom prices appear correctly in the cart for sports stickers",
+        "Price conversion between rupees (frontend display) and paise (backend storage) works correctly for sports stickers"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Fix the product catalog display issue where no products are showing on the main product catalog page despite products existing in the backend",
-      "target": "both",
+      "text": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-final"
-        ],
-        "quotes": [
-          "it shows no products"
+          "msg-latest"
         ]
       },
       "acceptanceCriteria": [
-        "All products stored in the backend are visible on the product catalog page",
-        "Product cards display correctly with images, names, prices, and add-to-cart buttons",
-        "Loading and error states are handled appropriately",
-        "If no products exist in the database, an appropriate empty state is shown rather than appearing broken"
+        "Price input in CustomStickerForm accepts decimal values for rupees",
+        "Price conversion multiplies by 100 to convert rupees to paise before backend submission",
+        "Conversion logic works consistently for both table tennis and badminton categories"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Verify that the backend getProducts query is returning products correctly and investigate any data fetching or query issues between frontend and backend",
-      "target": "both",
+      "text": "Ensure the backend CustomSticker type and createCustomSticker function properly handle and store custom prices for sports categories",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-user-final"
-        ],
-        "quotes": [
-          "it shows no products"
+          "msg-latest"
         ]
       },
       "acceptanceCriteria": [
-        "Backend getProducts() method successfully returns all stored products",
-        "Frontend useProducts query hook correctly fetches and processes the product data",
-        "Any query errors are properly logged and displayed to aid debugging"
+        "Custom sticker records store price values in paise (Nat)",
+        "createCustomSticker function accepts and persists custom price values",
+        "Price data is retrievable via getCustomStickers query for all categories"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Prices display with proper decimal formatting (divided by 100)",
+        "Currency symbol (₹) appears correctly",
+        "Price display is consistent for both table tennis and badminton stickers"
       ]
     }
   ],
   "constraints": [
-    "Maintain existing authentication flow using Internet Identity",
-    "Preserve the current admin role-based access control system",
-    "Do not modify the backend product data structure or pricing logic"
+    "Do not change the existing price storage format (paise as Nat in backend)",
+    "Maintain backward compatibility with existing custom stickers",
+    "Preserve the existing authentication and authorization flow"
   ],
   "nonGoals": [
-    "Adding new product features or fields",
-    "Redesigning the admin panel UI",
-    "Implementing new authentication methods"
+    "Changing the overall pricing model for regular products",
+    "Modifying the cart checkout flow",
+    "Adding new product categories beyond table tennis and badminton"
   ],
   "imageRequirements": {
     "required": [],

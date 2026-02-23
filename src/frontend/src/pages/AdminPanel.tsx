@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Package, Edit, Trash2, ShoppingBag } from 'lucide-react';
@@ -24,22 +24,6 @@ export default function AdminPanel() {
 
   const isAuthenticated = !!identity;
   const isCheckingAuth = isInitializing || isAdminLoading;
-
-  // Debug logging
-  useEffect(() => {
-    const timestamp = new Date().toISOString();
-    console.log('=== AdminPanel Debug Info ===', timestamp);
-    console.log('isInitializing:', isInitializing);
-    console.log('isAuthenticated:', isAuthenticated);
-    console.log('identity:', identity ? identity.getPrincipal().toString() : 'null');
-    console.log('isAdminLoading:', isAdminLoading);
-    console.log('isAdminFetched:', isAdminFetched);
-    console.log('isAdmin:', isAdmin);
-    console.log('isCheckingAuth:', isCheckingAuth);
-    console.log('products:', products);
-    console.log('productsLoading:', productsLoading);
-    console.log('=============================');
-  }, [isInitializing, isAuthenticated, identity, isAdminLoading, isAdminFetched, isAdmin, isCheckingAuth, products, productsLoading]);
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);

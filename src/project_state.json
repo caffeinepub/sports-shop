@@ -1,44 +1,59 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "E-commerce website with admin panel and product management",
+  "summary": "Sports themed sticker app with custom pricing functionality",
   "architectural_notes": [
-    "Admin panel for product management",
-    "Product database/storage system"
+    "App has sticker functionality with category support (stickers, sports)",
+    "Custom pricing feature exists but has category-specific issues"
   ],
   "known_issues": [
-    "Admin panel is inaccessible",
-    "No products are displaying"
+    "Custom prices not saving/working for sports category"
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-debug-and-fix-the-admin-panel-access-issue-preventing-users-from-accessing-the-admin-panel-at-admin-route",
-      "title": "Debug and fix the admin panel access issue preventing users from accessing the admin panel at /admin route",
+      "id": "feature-fix-the-custom-sticker-pricing-functionality-specifically-for-sports-stickers-to-ensure-custom-prices-can-be-set-saved-and-displayed-correctly",
+      "title": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-the-product-catalog-display-issue-where-no-products-are-showing-on-the-main-product-catalog-page-despite-products-existing-in-the-backend",
-      "title": "Fix the product catalog display issue where no products are showing on the main product catalog page despite products existing in the backend",
+      "id": "feature-verify-that-the-customstickerform-correctly-converts-custom-prices-from-rupees-to-paise-for-all-product-categories-including-sports-items",
+      "title": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-verify-that-the-backend-getproducts-query-is-returning-products-correctly-and-investigate-any-data-fetching-or-query-issues-between-frontend-and-backend",
-      "title": "Verify that the backend getProducts query is returning products correctly and investigate any data fetching or query issues between frontend and backend",
+      "id": "feature-verify-customstickercard-correctly-converts-stored-prices-from-paise-to-rupees-for-display-across-all-sports-categories",
+      "title": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
       "reqIds": [
-        "REQ-3"
+        "REQ-4"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Fix admin panel access and product display issues",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Fix custom prices not working for sports category",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Ensure the backend CustomSticker type and createCustomSticker function properly handle and store custom prices for sports categories",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Daily Sports Shop",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

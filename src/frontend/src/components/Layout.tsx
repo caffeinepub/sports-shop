@@ -7,7 +7,6 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { SiInstagram } from 'react-icons/si';
 import { toast } from 'sonner';
-import { useEffect } from 'react';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -20,19 +19,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isAuthenticated = !!identity;
   const isLoggingIn = loginStatus === 'logging-in';
 
-  // Debug logging for identity changes
-  useEffect(() => {
-    if (identity) {
-      const principal = identity.getPrincipal().toString();
-      const timestamp = new Date().toISOString();
-      console.log('=== Layout Identity Info ===', timestamp);
-      console.log('User Principal:', principal);
-      console.log('Is Authenticated:', isAuthenticated);
-      console.log('Is Admin:', isAdmin);
-      console.log('Is Admin Loading:', isAdminLoading);
-      console.log('===========================');
-    }
-  }, [identity, isAuthenticated, isAdmin, isAdminLoading]);
+  // Show admin link if user is authenticated and is confirmed admin
+  const showAdminLink = isAuthenticated && isAdmin === true;
 
   const handleAuth = async () => {
     if (isAuthenticated) {
@@ -86,13 +74,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               >
                 Stickers
               </Link>
-              {isAuthenticated && isAdmin && !isAdminLoading && (
+              {showAdminLink && (
                 <Link
                   to="/admin"
                   className="text-sm font-semibold transition-colors hover:text-primary flex items-center gap-1"
                 >
                   <Shield className="h-4 w-4" />
-                  Admin
+                  Admin Panel
                 </Link>
               )}
             </nav>
@@ -171,6 +159,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <li>
                     <Link to="/cart" className="text-muted-foreground hover:text-primary transition-colors">
                       Shopping Cart
+                    </Link>
+                  </li>
+                )}
+                {showAdminLink && (
+                  <li>
+                    <Link to="/admin" className="text-muted-foreground hover:text-primary transition-colors">
+                      Admin Panel
                     </Link>
                   </li>
                 )}

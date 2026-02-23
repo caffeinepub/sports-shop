@@ -8,6 +8,17 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const _CaffeineStorageCreateCertificateResult = IDL.Record({
+  'method' : IDL.Text,
+  'blob_hash' : IDL.Text,
+});
+export const _CaffeineStorageRefillInformation = IDL.Record({
+  'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const _CaffeineStorageRefillResult = IDL.Record({
+  'success' : IDL.Opt(IDL.Bool),
+  'topped_up_amount' : IDL.Opt(IDL.Nat),
+});
 export const ProductCategory = IDL.Variant({
   'tableTennisBalls' : IDL.Null,
   'badmintonShuttles' : IDL.Null,
@@ -20,6 +31,23 @@ export const UserRole = IDL.Variant({
 export const PaymentMethod = IDL.Variant({
   'cash' : IDL.Null,
   'googlePay' : IDL.Null,
+});
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
+export const StickerCategory = IDL.Variant({
+  'patterns' : IDL.Null,
+  'food' : IDL.Null,
+  'animals' : IDL.Null,
+  'sports' : IDL.Null,
+  'cartoon' : IDL.Null,
+});
+export const CustomSticker = IDL.Record({
+  'id' : IDL.Nat,
+  'creator' : IDL.Principal,
+  'name' : IDL.Text,
+  'description' : IDL.Opt(IDL.Text),
+  'category' : StickerCategory,
+  'image' : ExternalBlob,
+  'price' : IDL.Nat,
 });
 export const OrderStatus = IDL.Variant({
   'cancelled' : IDL.Null,
@@ -51,6 +79,32 @@ export const Product = IDL.Record({
 });
 
 export const idlService = IDL.Service({
+  '_caffeineStorageBlobIsLive' : IDL.Func(
+      [IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      ['query'],
+    ),
+  '_caffeineStorageBlobsToDelete' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      ['query'],
+    ),
+  '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      [],
+      [],
+    ),
+  '_caffeineStorageCreateCertificate' : IDL.Func(
+      [IDL.Text],
+      [_CaffeineStorageCreateCertificateResult],
+      [],
+    ),
+  '_caffeineStorageRefillCashier' : IDL.Func(
+      [IDL.Opt(_CaffeineStorageRefillInformation)],
+      [_CaffeineStorageRefillResult],
+      [],
+    ),
+  '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addProduct' : IDL.Func(
       [IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
@@ -61,10 +115,23 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'checkout' : IDL.Func([PaymentMethod, IDL.Text], [IDL.Nat], []),
   'clearCart' : IDL.Func([], [], []),
+  'createCustomSticker' : IDL.Func(
+      [ExternalBlob, IDL.Nat, IDL.Text, StickerCategory, IDL.Opt(IDL.Text)],
+      [CustomSticker],
+      [],
+    ),
+  'getAllCustomStickers' : IDL.Func([], [IDL.Vec(CustomSticker)], ['query']),
   'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+  'getCallerCustomStickers' : IDL.Func([], [IDL.Vec(CustomSticker)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCart' : IDL.Func([], [Cart], ['query']),
+  'getCustomSticker' : IDL.Func([IDL.Nat], [IDL.Opt(CustomSticker)], ['query']),
+  'getCustomStickersByUser' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Vec(CustomSticker)],
+      ['query'],
+    ),
   'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
   'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(Product)], ['query']),
   'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
@@ -74,6 +141,7 @@ export const idlService = IDL.Service({
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'removeCartItem' : IDL.Func([IDL.Nat], [], []),
   'removeProduct' : IDL.Func([IDL.Nat], [], []),
@@ -90,6 +158,17 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const _CaffeineStorageCreateCertificateResult = IDL.Record({
+    'method' : IDL.Text,
+    'blob_hash' : IDL.Text,
+  });
+  const _CaffeineStorageRefillInformation = IDL.Record({
+    'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const _CaffeineStorageRefillResult = IDL.Record({
+    'success' : IDL.Opt(IDL.Bool),
+    'topped_up_amount' : IDL.Opt(IDL.Nat),
+  });
   const ProductCategory = IDL.Variant({
     'tableTennisBalls' : IDL.Null,
     'badmintonShuttles' : IDL.Null,
@@ -102,6 +181,23 @@ export const idlFactory = ({ IDL }) => {
   const PaymentMethod = IDL.Variant({
     'cash' : IDL.Null,
     'googlePay' : IDL.Null,
+  });
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
+  const StickerCategory = IDL.Variant({
+    'patterns' : IDL.Null,
+    'food' : IDL.Null,
+    'animals' : IDL.Null,
+    'sports' : IDL.Null,
+    'cartoon' : IDL.Null,
+  });
+  const CustomSticker = IDL.Record({
+    'id' : IDL.Nat,
+    'creator' : IDL.Principal,
+    'name' : IDL.Text,
+    'description' : IDL.Opt(IDL.Text),
+    'category' : StickerCategory,
+    'image' : ExternalBlob,
+    'price' : IDL.Nat,
   });
   const OrderStatus = IDL.Variant({
     'cancelled' : IDL.Null,
@@ -130,6 +226,32 @@ export const idlFactory = ({ IDL }) => {
   });
   
   return IDL.Service({
+    '_caffeineStorageBlobIsLive' : IDL.Func(
+        [IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        ['query'],
+      ),
+    '_caffeineStorageBlobsToDelete' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        [],
+        [],
+      ),
+    '_caffeineStorageCreateCertificate' : IDL.Func(
+        [IDL.Text],
+        [_CaffeineStorageCreateCertificateResult],
+        [],
+      ),
+    '_caffeineStorageRefillCashier' : IDL.Func(
+        [IDL.Opt(_CaffeineStorageRefillInformation)],
+        [_CaffeineStorageRefillResult],
+        [],
+      ),
+    '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addProduct' : IDL.Func(
         [IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
@@ -140,10 +262,31 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'checkout' : IDL.Func([PaymentMethod, IDL.Text], [IDL.Nat], []),
     'clearCart' : IDL.Func([], [], []),
+    'createCustomSticker' : IDL.Func(
+        [ExternalBlob, IDL.Nat, IDL.Text, StickerCategory, IDL.Opt(IDL.Text)],
+        [CustomSticker],
+        [],
+      ),
+    'getAllCustomStickers' : IDL.Func([], [IDL.Vec(CustomSticker)], ['query']),
     'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+    'getCallerCustomStickers' : IDL.Func(
+        [],
+        [IDL.Vec(CustomSticker)],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCart' : IDL.Func([], [Cart], ['query']),
+    'getCustomSticker' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Opt(CustomSticker)],
+        ['query'],
+      ),
+    'getCustomStickersByUser' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(CustomSticker)],
+        ['query'],
+      ),
     'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
     'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(Product)], ['query']),
     'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
@@ -153,6 +296,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'removeCartItem' : IDL.Func([IDL.Nat], [], []),
     'removeProduct' : IDL.Func([IDL.Nat], [], []),

@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-debug-and-fix-the-admin-panel-access-issue-preventing-users-from-accessing-the-admin-panel-at-admin-route",
-      "featureTitle": "Debug and fix the admin panel access issue preventing users from accessing the admin panel at /admin route",
+      "featureId": "feature-fix-the-custom-sticker-pricing-functionality-specifically-for-sports-stickers-to-ensure-custom-prices-can-be-set-saved-and-displayed-correctly",
+      "featureTitle": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/AdminPanel.tsx"
+        "frontend/src/components/CustomStickerCard.tsx",
+        "frontend/src/components/CustomStickerForm.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -14,7 +14,8 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
         "REQ-1"
@@ -22,11 +23,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-fix-the-product-catalog-display-issue-where-no-products-are-showing-on-the-main-product-catalog-page-despite-products-existing-in-the-backend",
-      "featureTitle": "Fix the product catalog display issue where no products are showing on the main product catalog page despite products existing in the backend",
+      "featureId": "feature-verify-that-the-customstickerform-correctly-converts-custom-prices-from-rupees-to-paise-for-all-product-categories-including-sports-items",
+      "featureTitle": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/ProductCatalog.tsx"
+        "frontend/src/components/CustomStickerForm.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -34,7 +34,8 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
         "REQ-2"
@@ -42,11 +43,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-verify-that-the-backend-getproducts-query-is-returning-products-correctly-and-investigate-any-data-fetching-or-query-issues-between-frontend-and-backend",
-      "featureTitle": "Verify that the backend getProducts query is returning products correctly and investigate any data fetching or query issues between frontend and backend",
+      "featureId": "feature-verify-customstickercard-correctly-converts-stored-prices-from-paise-to-rupees-for-display-across-all-sports-categories",
+      "featureTitle": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/ProductCatalog.tsx"
+        "frontend/src/components/CustomStickerCard.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -54,10 +54,11 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-3"
+        "REQ-4"
       ],
       "confidence": "high"
     }

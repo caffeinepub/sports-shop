@@ -12,6 +12,16 @@ import type { Principal } from '@icp-sdk/core/principal';
 
 export type Cart = Array<CartItem>;
 export interface CartItem { 'productId' : bigint, 'quantity' : bigint }
+export interface CustomSticker {
+  'id' : bigint,
+  'creator' : Principal,
+  'name' : string,
+  'description' : [] | [string],
+  'category' : StickerCategory,
+  'image' : ExternalBlob,
+  'price' : bigint,
+}
+export type ExternalBlob = Uint8Array;
 export interface Order {
   'customerName' : string,
   'status' : OrderStatus,
@@ -36,11 +46,42 @@ export interface Product {
 }
 export type ProductCategory = { 'tableTennisBalls' : null } |
   { 'badmintonShuttles' : null };
+export type StickerCategory = { 'patterns' : null } |
+  { 'food' : null } |
+  { 'animals' : null } |
+  { 'sports' : null } |
+  { 'cartoon' : null };
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addProduct' : ActorMethod<
     [string, string, ProductCategory, bigint],
@@ -50,15 +91,24 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkout' : ActorMethod<[PaymentMethod, string], bigint>,
   'clearCart' : ActorMethod<[], undefined>,
+  'createCustomSticker' : ActorMethod<
+    [ExternalBlob, bigint, string, StickerCategory, [] | [string]],
+    CustomSticker
+  >,
+  'getAllCustomStickers' : ActorMethod<[], Array<CustomSticker>>,
   'getAllOrders' : ActorMethod<[], Array<Order>>,
+  'getCallerCustomStickers' : ActorMethod<[], Array<CustomSticker>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getCart' : ActorMethod<[], Cart>,
+  'getCustomSticker' : ActorMethod<[bigint], [] | [CustomSticker]>,
+  'getCustomStickersByUser' : ActorMethod<[Principal], Array<CustomSticker>>,
   'getOrder' : ActorMethod<[bigint], [] | [Order]>,
   'getProduct' : ActorMethod<[bigint], [] | [Product]>,
   'getProducts' : ActorMethod<[], Array<Product>>,
   'getUserOrders' : ActorMethod<[], Array<Order>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'isAdmin' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'removeCartItem' : ActorMethod<[bigint], undefined>,
   'removeProduct' : ActorMethod<[bigint], undefined>,
