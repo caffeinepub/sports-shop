@@ -1,38 +1,44 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
+  "summary": "E-commerce website with admin panel and product management",
+  "architectural_notes": [
+    "Admin panel for product management",
+    "Product database/storage system"
+  ],
   "known_issues": [
-    "Admin access not working - user principal needs to be configured properly"
+    "Admin panel is inaccessible",
+    "No products are displaying"
   ],
   "isFixRequest": true,
-  "existing_features": [],
-  "new_feature_requests": [
+  "existing_features": [
     {
-      "id": "AR-1",
-      "summary": "Change price to rupees 20",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Update the product price display format to show Indian Rupees (₹) instead of the current currency symbol",
+      "id": "feature-debug-and-fix-the-admin-panel-access-issue-preventing-users-from-accessing-the-admin-panel-at-admin-route",
+      "title": "Debug and fix the admin panel access issue preventing users from accessing the admin panel at /admin route",
       "reqIds": [
         "REQ-1"
       ],
-      "status": "pending"
+      "version": 1
     },
     {
-      "id": "AR-3",
-      "summary": "Set the default or current product price to 20 rupees (₹20)",
+      "id": "feature-fix-the-product-catalog-display-issue-where-no-products-are-showing-on-the-main-product-catalog-page-despite-products-existing-in-the-backend",
+      "title": "Fix the product catalog display issue where no products are showing on the main product catalog page despite products existing in the backend",
       "reqIds": [
         "REQ-2"
       ],
-      "status": "pending"
+      "version": 1
+    },
+    {
+      "id": "feature-verify-that-the-backend-getproducts-query-is-returning-products-correctly-and-investigate-any-data-fetching-or-query-issues-between-frontend-and-backend",
+      "title": "Verify that the backend getProducts query is returning products correctly and investigate any data fetching or query issues between frontend and backend",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
     }
   ],
-  "projectName": "Change product price to ₹20",
+  "new_feature_requests": [],
+  "projectName": "Fix admin panel access and product display issues",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

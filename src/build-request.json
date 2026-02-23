@@ -1,51 +1,73 @@
 {
   "kind": "build_request",
-  "title": "Change product price to ₹20",
-  "priority": "normal",
+  "title": "Fix admin panel access and product display issues",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the product price display format to show Indian Rupees (₹) instead of the current currency symbol",
+      "text": "Debug and fix the admin panel access issue preventing users from accessing the admin panel at /admin route",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-user-final"
         ],
         "quotes": [
-          "chnage the price to ruppes 20"
+          "i cant accses admin panel"
         ]
       },
       "acceptanceCriteria": [
-        "All product prices display with ₹ symbol prefix",
-        "Price formatting is consistent across ProductCard, CartItem, Cart, and Checkout pages"
+        "Admin users can successfully navigate to and view the admin panel",
+        "Non-admin users see the appropriate access denied screen",
+        "Navigation to /admin route works without errors"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Set the default or current product price to 20 rupees (₹20)",
-      "target": "backend",
+      "text": "Fix the product catalog display issue where no products are showing on the main product catalog page despite products existing in the backend",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-user-final"
         ],
         "quotes": [
-          "chnage the price to ruppes 20"
+          "it shows no products"
         ]
       },
       "acceptanceCriteria": [
-        "Product price is updated to 20 in the backend data model",
-        "Price displays as ₹20 in the frontend"
+        "All products stored in the backend are visible on the product catalog page",
+        "Product cards display correctly with images, names, prices, and add-to-cart buttons",
+        "Loading and error states are handled appropriately",
+        "If no products exist in the database, an appropriate empty state is shown rather than appearing broken"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Verify that the backend getProducts query is returning products correctly and investigate any data fetching or query issues between frontend and backend",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-user-final"
+        ],
+        "quotes": [
+          "it shows no products"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend getProducts() method successfully returns all stored products",
+        "Frontend useProducts query hook correctly fetches and processes the product data",
+        "Any query errors are properly logged and displayed to aid debugging"
       ]
     }
   ],
   "constraints": [
-    "Preserve existing product data structure and fields",
-    "Maintain price as numeric type for calculations"
+    "Maintain existing authentication flow using Internet Identity",
+    "Preserve the current admin role-based access control system",
+    "Do not modify the backend product data structure or pricing logic"
   ],
   "nonGoals": [
-    "Multi-currency support",
-    "Currency conversion logic",
-    "Changing other product attributes"
+    "Adding new product features or fields",
+    "Redesigning the admin panel UI",
+    "Implementing new authentication methods"
   ],
   "imageRequirements": {
     "required": [],

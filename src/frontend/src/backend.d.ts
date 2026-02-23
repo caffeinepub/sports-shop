@@ -55,16 +55,21 @@ export interface backendInterface {
     addToCart(productId: bigint, quantity: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkout(paymentMethod: PaymentMethod, deliveryAddress: string): Promise<bigint>;
+    clearCart(): Promise<void>;
     getAllOrders(): Promise<Array<Order>>;
-    getAllProducts(): Promise<Array<Product>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCart(): Promise<Cart>;
     getOrder(orderId: bigint): Promise<Order | null>;
     getProduct(productId: bigint): Promise<Product | null>;
+    getProducts(): Promise<Array<Product>>;
+    getUserOrders(): Promise<Array<Order>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    removeCartItem(productId: bigint): Promise<void>;
     removeProduct(productId: bigint): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    updateCartItem(productId: bigint, quantity: bigint): Promise<void>;
+    updateOrderStatus(orderId: bigint, status: OrderStatus): Promise<void>;
     updateProduct(productId: bigint, name: string, description: string, category: ProductCategory, stock: bigint): Promise<void>;
 }

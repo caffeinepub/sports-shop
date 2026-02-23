@@ -15,7 +15,7 @@ import { useNavigate } from '@tanstack/react-router';
 export default function AdminPanel() {
   const navigate = useNavigate();
   const { identity, isInitializing } = useInternetIdentity();
-  const { data: isAdmin, isLoading: isAdminLoading } = useIsCallerAdmin();
+  const { data: isAdmin, isLoading: isAdminLoading, isFetched: isAdminFetched } = useIsCallerAdmin();
   const { data: products, isLoading: productsLoading } = useGetAllProducts();
   const removeProduct = useRemoveProduct();
 
@@ -23,7 +23,7 @@ export default function AdminPanel() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const isAuthenticated = !!identity;
-  const isLoading = isInitializing || isAdminLoading || productsLoading;
+  const isCheckingAuth = isInitializing || isAdminLoading;
 
   // Debug logging
   useEffect(() => {
@@ -33,10 +33,13 @@ export default function AdminPanel() {
     console.log('isAuthenticated:', isAuthenticated);
     console.log('identity:', identity ? identity.getPrincipal().toString() : 'null');
     console.log('isAdminLoading:', isAdminLoading);
+    console.log('isAdminFetched:', isAdminFetched);
     console.log('isAdmin:', isAdmin);
-    console.log('Will show AccessDeniedScreen:', !isAuthenticated || !isAdmin);
+    console.log('isCheckingAuth:', isCheckingAuth);
+    console.log('products:', products);
+    console.log('productsLoading:', productsLoading);
     console.log('=============================');
-  }, [isInitializing, isAuthenticated, identity, isAdminLoading, isAdmin]);
+  }, [isInitializing, isAuthenticated, identity, isAdminLoading, isAdminFetched, isAdmin, isCheckingAuth, products, productsLoading]);
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
@@ -72,7 +75,8 @@ export default function AdminPanel() {
     }
   };
 
-  if (isLoading) {
+  // Show loading state while checking authentication and admin status
+  if (isCheckingAuth) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
@@ -92,7 +96,8 @@ export default function AdminPanel() {
     );
   }
 
-  if (!isAuthenticated || !isAdmin) {
+  // Show access denied if not authenticated or not admin (after auth check is complete)
+  if (!isAuthenticated || (isAdminFetched && !isAdmin)) {
     return <AccessDeniedScreen />;
   }
 

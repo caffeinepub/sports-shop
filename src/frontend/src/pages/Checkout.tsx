@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, Banknote, MapPin } from 'lucide-react';
-import { useGetCart, useGetAllProducts, useCheckout } from '../hooks/useQueries';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CreditCard, Banknote, MapPin, User, AlertCircle } from 'lucide-react';
+import { useGetCart, useGetAllProducts, useCheckout, useGetCallerUserProfile } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { PaymentMethod } from '../backend';
 import { toast } from 'sonner';
@@ -17,15 +18,18 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<string>('cash');
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; address?: string }>({});
 
   const { identity, login } = useInternetIdentity();
   const isAuthenticated = !!identity;
   const { data: cart, isLoading: cartLoading } = useGetCart();
   const { data: products, isLoading: productsLoading } = useGetAllProducts();
+  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
   const completeCheckout = useCheckout();
 
-  const isLoading = cartLoading || productsLoading;
+  const isLoading = cartLoading || productsLoading || profileLoading;
 
   const cartWithProducts = cart?.map((item) => {
     const product = products?.find((p) => p.id === item.productId);
@@ -35,6 +39,23 @@ export default function Checkout() {
   const total = cartWithProducts?.reduce((sum, item) => {
     return sum + Number(item.product.price) * Number(item.quantity);
   }, 0) || 0;
+
+  const validateForm = (): boolean => {
+    const newErrors: { name?: string; address?: string } = {};
+
+    if (!customerName.trim()) {
+      newErrors.name = 'Customer name is required';
+    }
+
+    if (!deliveryAddress.trim()) {
+      newErrors.address = 'Delivery address is required';
+    } else if (deliveryAddress.trim().length < 10) {
+      newErrors.address = 'Please provide a complete address';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleCheckout = async () => {
     if (!isAuthenticated) {
@@ -48,9 +69,9 @@ export default function Checkout() {
       return;
     }
 
-    if (!deliveryAddress.trim()) {
-      toast.error('Delivery address required', {
-        description: 'Please enter your delivery address.',
+    if (!validateForm()) {
+      toast.error('Please fill in all required fields', {
+        description: 'Customer name and delivery address are required.',
       });
       return;
     }
@@ -158,21 +179,73 @@ export default function Checkout() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl font-black flex items-center gap-2">
+                <User className="h-6 w-6" />
+                Customer Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="customerName">
+                  Full Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="customerName"
+                  placeholder="Enter your full name"
+                  value={customerName}
+                  onChange={(e) => {
+                    setCustomerName(e.target.value);
+                    if (errors.name) {
+                      setErrors({ ...errors, name: undefined });
+                    }
+                  }}
+                  className={errors.name ? 'border-destructive' : ''}
+                />
+                {errors.name && (
+                  <p className="text-sm text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.name}
+                  </p>
+                )}
+                {userProfile && (
+                  <p className="text-xs text-muted-foreground">
+                    Your profile name: {userProfile.name}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-black flex items-center gap-2">
                 <MapPin className="h-6 w-6" />
                 Delivery Address
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <Label htmlFor="address">Full Address</Label>
+                <Label htmlFor="address">
+                  Full Address <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
                   id="address"
                   placeholder="Enter your complete delivery address including street, city, state, and PIN code"
                   value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  onChange={(e) => {
+                    setDeliveryAddress(e.target.value);
+                    if (errors.address) {
+                      setErrors({ ...errors, address: undefined });
+                    }
+                  }}
                   rows={4}
-                  className="resize-none"
+                  className={`resize-none ${errors.address ? 'border-destructive' : ''}`}
                 />
+                {errors.address && (
+                  <p className="text-sm text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.address}
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Please provide a complete address for accurate delivery
                 </p>
@@ -220,11 +293,20 @@ export default function Checkout() {
             </CardContent>
           </Card>
 
+          {(errors.name || errors.address) && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Please fill in all required fields before completing your order.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Button
             className="w-full font-bold text-base h-12"
             size="lg"
             onClick={handleCheckout}
-            disabled={isProcessing || !deliveryAddress.trim()}
+            disabled={isProcessing || !customerName.trim() || !deliveryAddress.trim()}
           >
             {isProcessing ? 'Processing...' : 'Complete Order'}
           </Button>

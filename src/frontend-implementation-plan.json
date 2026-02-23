@@ -1,35 +1,84 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Change product price to ₹20",
+  "title": "Fix admin panel access and product display issues",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update the product price display format to show Indian Rupees (₹) instead of the current currency symbol",
+      "summary": "Fix admin panel access issue preventing navigation to /admin route",
       "acceptanceCriteria": [
-        "All product prices display with ₹ symbol prefix",
-        "Price formatting is consistent across ProductCard, CartItem, Cart, and Checkout pages"
+        "Admin users can successfully navigate to and view the admin panel",
+        "Non-admin users see the appropriate access denied screen",
+        "Navigation to /admin route works without errors"
       ],
       "file_operations": [
         {
+          "path": "frontend/src/pages/AdminPanel.tsx",
+          "operation": "modify",
+          "description": "Debug and fix the admin panel access logic by reviewing the authentication and authorization checks. Ensure the useGetCallerUserRole and useIsCallerAdmin hooks are properly fetching data before rendering access control decisions. Add proper loading states to prevent premature access denial. Verify the AccessDeniedScreen is only shown after role checks complete."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review and fix the useGetCallerUserRole and useIsCallerAdmin query hooks to ensure they properly handle the actor dependency and return correct loading states. Ensure queries are enabled only when actor is available and not fetching. Add proper error handling and retry logic for authorization queries."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Verify the /admin route is correctly registered in the router configuration and that the AdminPanel component is properly imported and mounted. Ensure no route guards are blocking access before the component renders."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Fix product catalog display showing no products despite backend data existing",
+      "acceptanceCriteria": [
+        "All products stored in the backend are visible on the product catalog page",
+        "Product cards display correctly with images, names, prices, and add-to-cart buttons",
+        "Loading and error states are handled appropriately",
+        "If no products exist in the database, an appropriate empty state is shown rather than appearing broken"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ProductCatalog.tsx",
+          "operation": "modify",
+          "description": "Debug and fix the product display logic by reviewing how the useGetProducts query hook is being used. Ensure the query is properly enabled after the actor is available, and that the products data is correctly mapped to ProductCard components. Add console logging to inspect the raw products data returned from the backend. Verify the loading, error, and empty states are rendering correctly. Ensure the grid layout properly displays product cards when data is available."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review and fix the useGetProducts query hook to ensure it properly fetches products from the backend. Verify the query is enabled only when the actor is available and not fetching. Check that the queryFn correctly calls actor.getProducts() and returns the result without transformation errors. Add proper error handling and logging to help diagnose data fetching issues."
+        },
+        {
           "path": "frontend/src/components/ProductCard.tsx",
           "operation": "modify",
-          "description": "Update price display formatting to show ₹ symbol prefix instead of current currency format. Ensure numeric price conversion from bigint maintains precision for display as ₹XX format."
+          "description": "Review the ProductCard component to ensure it correctly receives and displays product data including name, description, price, stock, and category. Verify the product image mapping logic correctly handles all ProductCategory enum values and maps to the correct generated image assets in frontend/public/assets/generated/. Ensure bigint values for price and stock are properly converted to numbers for display."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Verify backend getProducts query returns data correctly and investigate frontend-backend data fetching issues",
+      "acceptanceCriteria": [
+        "Backend getProducts() method successfully returns all stored products",
+        "Frontend useProducts query hook correctly fetches and processes the product data",
+        "Any query errors are properly logged and displayed to aid debugging"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add comprehensive error logging to the useGetProducts query hook to capture and display any errors during the backend call. Log the raw response data, actor state, and authentication status to help diagnose communication issues. Ensure the query properly handles cases where the backend returns an empty array versus returning an error."
         },
         {
-          "path": "frontend/src/components/CartItem.tsx",
+          "path": "frontend/src/hooks/useActor.ts",
           "operation": "modify",
-          "description": "Update price and subtotal display formatting to show ₹ symbol prefix for both individual product price and calculated subtotal. Maintain existing bigint conversion logic while changing currency symbol."
+          "description": "Review the actor initialization logic to ensure the backend connection is properly established before queries execute. Add logging to track actor creation, authentication state changes, and any connection errors. Verify that query invalidation and refetching work correctly when the actor state changes."
         },
         {
-          "path": "frontend/src/pages/Cart.tsx",
+          "path": "frontend/src/pages/ProductCatalog.tsx",
           "operation": "modify",
-          "description": "Update order summary total price display to show ₹ symbol prefix in the cart summary section. Ensure consistency with other price displays."
-        },
-        {
-          "path": "frontend/src/pages/Checkout.tsx",
-          "operation": "modify",
-          "description": "Update order summary and total price display in checkout page to show ₹ symbol prefix. Apply formatting consistently to all price displays in the order summary section."
+          "description": "Add detailed error display to the ProductCatalog page that shows specific error messages from the backend query. Include debugging information such as authentication status, actor availability, and query state to help identify whether the issue is with data fetching, data processing, or rendering. Display this information in development mode to aid troubleshooting."
         }
       ]
     }

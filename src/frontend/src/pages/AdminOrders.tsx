@@ -1,8 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ShoppingBag, Package, MapPin, CreditCard } from 'lucide-react';
-import { useGetAllOrders, useIsCallerAdmin, useGetAllProducts } from '../hooks/useQueries';
+import { Package, MapPin, CreditCard, User } from 'lucide-react';
+import { useGetAllOrders, useIsCallerAdmin } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import AccessDeniedScreen from '../components/AccessDeniedScreen';
 import { Order, OrderStatus, PaymentMethod } from '../backend';
@@ -10,12 +9,11 @@ import { useEffect } from 'react';
 
 export default function AdminOrders() {
   const { identity, isInitializing } = useInternetIdentity();
-  const { data: isAdmin, isLoading: isAdminLoading } = useIsCallerAdmin();
+  const { data: isAdmin, isLoading: isAdminLoading, isFetched: isAdminFetched } = useIsCallerAdmin();
   const { data: orders, isLoading: ordersLoading } = useGetAllOrders();
-  const { data: products } = useGetAllProducts();
 
   const isAuthenticated = !!identity;
-  const isLoading = isInitializing || isAdminLoading || ordersLoading;
+  const isCheckingAuth = isInitializing || isAdminLoading;
 
   // Debug logging
   useEffect(() => {
@@ -25,17 +23,20 @@ export default function AdminOrders() {
     console.log('isAuthenticated:', isAuthenticated);
     console.log('identity:', identity ? identity.getPrincipal().toString() : 'null');
     console.log('isAdminLoading:', isAdminLoading);
+    console.log('isAdminFetched:', isAdminFetched);
     console.log('isAdmin:', isAdmin);
-    console.log('Will show AccessDeniedScreen:', !isAuthenticated || !isAdmin);
+    console.log('isCheckingAuth:', isCheckingAuth);
+    console.log('ordersLoading:', ordersLoading);
+    console.log('orders count:', orders?.length || 0);
     console.log('==============================');
-  }, [isInitializing, isAuthenticated, identity, isAdminLoading, isAdmin]);
+  }, [isInitializing, isAuthenticated, identity, isAdminLoading, isAdminFetched, isAdmin, isCheckingAuth, ordersLoading, orders]);
 
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case OrderStatus.pending:
-        return <Badge variant="secondary">Pending</Badge>;
+        return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20">Pending</Badge>;
       case OrderStatus.completed:
-        return <Badge className="bg-green-600">Completed</Badge>;
+        return <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20">Completed</Badge>;
       case OrderStatus.cancelled:
         return <Badge variant="destructive">Cancelled</Badge>;
       default:
@@ -43,7 +44,7 @@ export default function AdminOrders() {
     }
   };
 
-  const getPaymentMethodLabel = (method: PaymentMethod) => {
+  const getPaymentMethodLabel = (method: PaymentMethod): string => {
     switch (method) {
       case PaymentMethod.cash:
         return 'Cash on Delivery';
@@ -54,16 +55,12 @@ export default function AdminOrders() {
     }
   };
 
-  const getProductName = (productId: bigint): string => {
-    const product = products?.find(p => p.id === productId);
-    return product?.name || `Product #${productId}`;
-  };
-
-  if (isLoading) {
+  // Show loading state while checking authentication and admin status
+  if (isCheckingAuth) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-black mb-8">Orders</h1>
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-4xl font-black mb-8">All Orders</h1>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
@@ -79,102 +76,102 @@ export default function AdminOrders() {
     );
   }
 
-  if (!isAuthenticated || !isAdmin) {
+  // Show access denied if not authenticated or not admin (after auth check is complete)
+  if (!isAuthenticated || (isAdminFetched && !isAdmin)) {
     return <AccessDeniedScreen />;
   }
 
+  // Sort orders by newest first (assuming higher order IDs are newer)
+  const sortedOrders = orders ? [...orders].reverse() : [];
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-black mb-2">Orders</h1>
+          <h1 className="text-4xl font-black mb-2">All Orders</h1>
           <p className="text-muted-foreground">
-            View and manage all customer orders
+            View and manage customer orders
           </p>
         </div>
 
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ShoppingBag className="h-5 w-5" />
-              Order Overview
-            </CardTitle>
-            <CardDescription>
-              {orders?.length || 0} order{orders?.length !== 1 ? 's' : ''} received
-            </CardDescription>
-          </CardHeader>
-        </Card>
-
         {ordersLoading ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <p className="text-muted-foreground">Loading orders...</p>
-            </CardContent>
-          </Card>
-        ) : orders && orders.length > 0 ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="p-6">
+                  <div className="h-6 bg-muted rounded w-1/3 mb-4" />
+                  <div className="h-4 bg-muted rounded w-2/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : sortedOrders && sortedOrders.length > 0 ? (
           <div className="space-y-6">
-            {orders.map((order, index) => (
-              <Card key={index} className="overflow-hidden">
-                <CardHeader className="bg-muted/30">
+            {sortedOrders.map((order, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle className="text-xl mb-1">
-                        Order #{index + 1}
+                      <CardTitle className="flex items-center gap-2">
+                        <User className="h-5 w-5" />
+                        {order.customerName}
                       </CardTitle>
-                      <CardDescription className="flex items-center gap-2">
-                        <span className="font-semibold">{order.customerName}</span>
-                        <span className="text-xs">•</span>
-                        <span className="text-xs">{order.user.toString().slice(0, 10)}...</span>
+                      <CardDescription className="mt-1">
+                        Order #{index + 1}
                       </CardDescription>
                     </div>
                     {getStatusBadge(order.status)}
                   </div>
                 </CardHeader>
-                <CardContent className="p-6">
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <div className="flex items-start gap-2 mb-4">
-                        <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                        <div>
-                          <p className="font-semibold mb-1">Delivery Address</p>
-                          <p className="text-sm text-muted-foreground">{order.deliveryAddress}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
-                        <div>
-                          <p className="font-semibold mb-1">Payment Method</p>
-                          <p className="text-sm text-muted-foreground">
-                            {getPaymentMethodLabel(order.paymentMethod)}
-                          </p>
-                        </div>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm font-semibold mb-1">Delivery Address</p>
+                        <p className="text-sm text-muted-foreground">{order.deliveryAddress}</p>
                       </div>
                     </div>
-                    <div>
-                      <div className="flex items-start gap-2">
-                        <Package className="h-5 w-5 text-muted-foreground mt-0.5" />
-                        <div className="flex-1">
-                          <p className="font-semibold mb-2">Order Items</p>
-                          <div className="space-y-2">
-                            {order.items.map((item, itemIndex) => (
-                              <div key={itemIndex} className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                  {getProductName(item.productId)} × {Number(item.quantity)}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                    <div className="flex items-start gap-3">
+                      <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm font-semibold mb-1">Payment Method</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getPaymentMethodLabel(order.paymentMethod)}
+                        </p>
                       </div>
                     </div>
                   </div>
+
                   <div className="border-t pt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold">Total Amount</span>
-                      <span className="text-2xl font-black text-primary">
-                        ₹{Number(order.total)}
-                      </span>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Package className="h-5 w-5 text-muted-foreground" />
+                      <p className="font-semibold">Order Items</p>
                     </div>
+                    <div className="space-y-2">
+                      {order.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className="flex justify-between items-center text-sm bg-muted/30 p-3 rounded-lg">
+                          <span className="text-muted-foreground">
+                            Product ID: {item.productId.toString()}
+                          </span>
+                          <div className="flex items-center gap-4">
+                            <span className="text-muted-foreground">
+                              Qty: <span className="font-semibold text-foreground">{Number(item.quantity)}</span>
+                            </span>
+                            <span className="font-semibold text-primary">
+                              ₹{Number(item.quantity) * 20}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-4 flex justify-between items-center">
+                    <span className="text-lg font-bold">Total Amount</span>
+                    <span className="text-2xl font-black text-primary">
+                      ₹{Number(order.total)}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -183,7 +180,7 @@ export default function AdminOrders() {
         ) : (
           <Card>
             <CardContent className="p-12 text-center">
-              <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-xl font-bold mb-2">No orders yet</h3>
               <p className="text-muted-foreground">
                 Orders will appear here once customers make purchases

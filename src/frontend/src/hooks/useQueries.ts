@@ -3,6 +3,7 @@ import { useActor } from './useActor';
 import { PaymentMethod, ProductCategory, UserProfile, Product as BackendProduct, UserRole } from '../backend';
 import { Cart } from '../types';
 import { Principal } from '@dfinity/principal';
+import { useInternetIdentity } from './useInternetIdentity';
 
 export function useGetAllProducts() {
   const { actor, isFetching } = useActor();
@@ -10,8 +11,19 @@ export function useGetAllProducts() {
   return useQuery<BackendProduct[]>({
     queryKey: ['products'],
     queryFn: async () => {
-      if (!actor) return [];
-      return actor.getAllProducts();
+      if (!actor) {
+        console.log('[useGetAllProducts] Actor not available');
+        return [];
+      }
+      console.log('[useGetAllProducts] Fetching products from backend...');
+      try {
+        const products = await actor.getProducts();
+        console.log('[useGetAllProducts] Products fetched:', products.length, 'products');
+        return products;
+      } catch (error) {
+        console.error('[useGetAllProducts] Error fetching products:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
   });
@@ -58,6 +70,7 @@ export function useAddToCart() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 }
@@ -69,14 +82,7 @@ export function useUpdateCartItem() {
   return useMutation({
     mutationFn: async ({ productId, quantity }: { productId: bigint; quantity: bigint }) => {
       if (!actor) throw new Error('Actor not initialized');
-      // The backend doesn't have an update method, so we need to clear and re-add
-      // This is a workaround - ideally the backend would have an updateCart method
-      const cart = await actor.getCart();
-      const otherItems = cart.filter(item => item.productId !== productId);
-      
-      // Clear cart and re-add items
-      // Note: This is not ideal but works with current backend API
-      return actor.addToCart(productId, quantity);
+      return actor.updateCartItem(productId, quantity);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
@@ -91,9 +97,7 @@ export function useRemoveCartItem() {
   return useMutation({
     mutationFn: async (productId: bigint) => {
       if (!actor) throw new Error('Actor not initialized');
-      // Backend doesn't have a remove item method
-      // This is a placeholder - the actual implementation would need backend support
-      throw new Error('Remove cart item not implemented in backend');
+      return actor.removeCartItem(productId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
@@ -113,6 +117,7 @@ export function useCheckout() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 }
@@ -163,13 +168,19 @@ export function useRemoveProduct() {
 }
 
 export function useIsCallerAdmin() {
-  const { actor, isFetching } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity, isInitializing } = useInternetIdentity();
 
-  return useQuery<boolean>({
-    queryKey: ['isAdmin'],
+  const query = useQuery<boolean>({
+    queryKey: ['isAdmin', identity?.getPrincipal().toString()],
     queryFn: async () => {
       if (!actor) {
         console.log('[useIsCallerAdmin] Actor not available, returning false');
+        return false;
+      }
+      
+      if (!identity) {
+        console.log('[useIsCallerAdmin] Not authenticated, returning false');
         return false;
       }
       
@@ -182,14 +193,19 @@ export function useIsCallerAdmin() {
         console.error('[useIsCallerAdmin] Error checking admin status:', error);
         if (error instanceof Error) {
           console.error('[useIsCallerAdmin] Error message:', error.message);
-          console.error('[useIsCallerAdmin] Error stack:', error.stack);
         }
         return false;
       }
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !actorFetching && !!identity && !isInitializing,
     retry: false,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
+
+  return {
+    ...query,
+    isLoading: actorFetching || isInitializing || query.isLoading,
+  };
 }
 
 export function useGetCallerUserProfile() {

@@ -3,14 +3,11 @@ import Nat "mo:core/Nat";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
+import Array "mo:core/Array";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-import Migration "migration";
-
-// Use migration to ensure the access control state is preserved during upgrades
-(with migration = Migration.run)
 actor {
   type Product = {
     id : Nat;
@@ -69,7 +66,6 @@ actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Initialize the first admin during canister deployment
   system func preupgrade() {};
   system func postupgrade() {};
 
@@ -98,7 +94,7 @@ actor {
     products.get(productId);
   };
 
-  public query ({ caller }) func getAllProducts() : async [Product] {
+  public query ({ caller }) func getProducts() : async [Product] {
     products.values().toArray();
   };
 
@@ -154,6 +150,8 @@ actor {
     };
   };
 
+  // Shopping Cart Logic
+
   public query ({ caller }) func getCart() : async Cart {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access cart");
@@ -169,19 +167,121 @@ actor {
       Runtime.trap("Unauthorized: Only users can add to cart");
     };
 
-    switch (products.get(productId)) {
-      case (null) { Runtime.trap("Product not found") };
-      case (?_) {
-        let cart = switch (carts.get(caller)) {
-          case (null) { [] };
-          case (?existingCart) { existingCart };
-        };
+    if (quantity == 0) {
+      Runtime.trap("Quantity must be greater than 0");
+    };
 
-        let updatedCart = cart.concat([{ productId; quantity }]);
-        carts.add(caller, updatedCart);
-      };
+    // Validate product exists and has sufficient stock
+    let product = switch (products.get(productId)) {
+      case (null) { Runtime.trap("Product not found") };
+      case (?p) { p };
+    };
+
+    if (product.stock < quantity) {
+      Runtime.trap("Insufficient stock available");
+    };
+
+    let currentCart = switch (carts.get(caller)) {
+      case (null) { [] };
+      case (?cart) { cart };
+    };
+
+    // Check if product already exists in cart
+    var productExists = false;
+    let updatedCart = currentCart.map(
+      func(item) {
+        if (item.productId == productId) {
+          productExists := true;
+          let newQuantity = item.quantity + quantity;
+          if (product.stock < newQuantity) {
+            Runtime.trap("Insufficient stock available");
+          };
+          { productId; quantity = newQuantity };
+        } else {
+          item;
+        };
+      }
+    );
+
+    if (productExists) {
+      carts.add(caller, updatedCart);
+    } else {
+      carts.add(caller, currentCart.concat([{ productId; quantity }]));
     };
   };
+
+  public shared ({ caller }) func updateCartItem(productId : Nat, quantity : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update cart");
+    };
+
+    if (quantity == 0) {
+      Runtime.trap("Quantity must be greater than 0. Use removeCartItem to remove items.");
+    };
+
+    // Validate product exists and has sufficient stock
+    let product = switch (products.get(productId)) {
+      case (null) { Runtime.trap("Product not found") };
+      case (?p) { p };
+    };
+
+    if (product.stock < quantity) {
+      Runtime.trap("Insufficient stock available");
+    };
+
+    let currentCart = switch (carts.get(caller)) {
+      case (null) { Runtime.trap("Product not in cart") };
+      case (?cart) { cart };
+    };
+
+    var itemFound = false;
+    let updatedCart = currentCart.map(
+      func(item) {
+        if (item.productId == productId) {
+          itemFound := true;
+          { productId; quantity };
+        } else {
+          item;
+        };
+      }
+    );
+
+    if (not itemFound) {
+      Runtime.trap("Product not in cart");
+    };
+
+    carts.add(caller, updatedCart);
+  };
+
+  public shared ({ caller }) func removeCartItem(productId : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update cart");
+    };
+
+    let currentCart = switch (carts.get(caller)) {
+      case (null) { Runtime.trap("Cart is empty") };
+      case (?cart) { cart };
+    };
+
+    let updatedCart = currentCart.filter(
+      func(item) { item.productId != productId }
+    );
+
+    if (updatedCart.size() == currentCart.size()) {
+      Runtime.trap("Product not in cart");
+    };
+
+    carts.add(caller, updatedCart);
+  };
+
+  public shared ({ caller }) func clearCart() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can clear cart");
+    };
+    carts.remove(caller);
+  };
+
+  // Checkout Logic
 
   public shared ({ caller }) func checkout(paymentMethod : PaymentMethod, deliveryAddress : Text) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
@@ -189,21 +289,35 @@ actor {
     };
 
     let cart = switch (carts.get(caller)) {
-      case (null) { Runtime.trap("Cart not found") };
-      case (?cart) { cart };
+      case (null) { Runtime.trap("Cart empty") };
+      case (?cart) {
+        if (cart.size() == 0) {
+          Runtime.trap("Cart empty");
+        };
+        cart;
+      };
     };
 
-    var total : Nat = 0;
-    cart.forEach(
-      func(item) {
-        switch (products.get(item.productId)) {
-          case (null) { ();
-          };
-          case (?product) {
-            total += product.price * item.quantity;
+    // Validate stock availability for all items
+    for (item in cart.vals()) {
+      switch (products.get(item.productId)) {
+        case (null) { Runtime.trap("Product not found: " # item.productId.toText()) };
+        case (?product) {
+          if (product.stock < item.quantity) {
+            Runtime.trap("Insufficient stock for product: " # product.name);
           };
         };
-      }
+      };
+    };
+
+    let total = cart.foldLeft(
+      0,
+      func(acc, item) {
+        switch (products.get(item.productId)) {
+          case (null) { acc };
+          case (?product) { acc + (product.price * item.quantity) };
+        };
+      },
     );
 
     let userProfile = switch (userProfiles.get(caller)) {
@@ -222,9 +336,29 @@ actor {
     };
 
     orders.add(nextOrderId, newOrder);
+
+    // Reduce stock for all items in the order
+    for (item in cart.vals()) {
+      switch (products.get(item.productId)) {
+        case (null) {};
+        case (?product) {
+          let updatedProduct : Product = {
+            id = product.id;
+            name = product.name;
+            description = product.description;
+            price = product.price;
+            category = product.category;
+            stock = product.stock - item.quantity;
+          };
+          products.add(item.productId, updatedProduct);
+        };
+      };
+    };
+
     carts.remove(caller);
+    let orderId = nextOrderId;
     nextOrderId += 1;
-    nextOrderId - 1;
+    orderId;
   };
 
   public query ({ caller }) func getOrder(orderId : Nat) : async ?Order {
@@ -239,10 +373,39 @@ actor {
     };
   };
 
+  public query ({ caller }) func getUserOrders() : async [Order] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view their orders");
+    };
+    orders.values().filter(func(order) { order.user == caller }).toArray();
+  };
+
   public query ({ caller }) func getAllOrders() : async [Order] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can view all orders");
     };
     orders.values().toArray();
+  };
+
+  public shared ({ caller }) func updateOrderStatus(orderId : Nat, status : OrderStatus) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update order status");
+    };
+
+    switch (orders.get(orderId)) {
+      case (null) { Runtime.trap("Order not found") };
+      case (?order) {
+        let updatedOrder : Order = {
+          user = order.user;
+          items = order.items;
+          total = order.total;
+          paymentMethod = order.paymentMethod;
+          status;
+          deliveryAddress = order.deliveryAddress;
+          customerName = order.customerName;
+        };
+        orders.add(orderId, updatedOrder);
+      };
+    };
   };
 };

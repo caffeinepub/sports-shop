@@ -1,4 +1,65 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-debug-and-fix-the-admin-panel-access-issue-preventing-users-from-accessing-the-admin-panel-at-admin-route",
+      "featureTitle": "Debug and fix the admin panel access issue preventing users from accessing the admin panel at /admin route",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminPanel.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-product-catalog-display-issue-where-no-products-are-showing-on-the-main-product-catalog-page-despite-products-existing-in-the-backend",
+      "featureTitle": "Fix the product catalog display issue where no products are showing on the main product catalog page despite products existing in the backend",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/ProductCatalog.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-verify-that-the-backend-getproducts-query-is-returning-products-correctly-and-investigate-any-data-fetching-or-query-issues-between-frontend-and-backend",
+      "featureTitle": "Verify that the backend getProducts query is returning products correctly and investigate any data fetching or query issues between frontend and backend",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/ProductCatalog.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
 }
