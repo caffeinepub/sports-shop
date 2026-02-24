@@ -20,7 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isLoggingIn = loginStatus === 'logging-in';
 
   // Show admin link if user is authenticated and is confirmed admin
-  const showAdminLink = isAuthenticated && isAdmin === true;
+  const showAdminLink = isAuthenticated && !isAdminLoading && isAdmin === true;
 
   const handleAuth = async () => {
     if (isAuthenticated) {

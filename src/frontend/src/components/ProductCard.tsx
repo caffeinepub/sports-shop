@@ -7,6 +7,7 @@ import { ProductCategory, Product } from '../backend';
 import { useAddToCart } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { toast } from 'sonner';
+import { formatCurrency } from '../utils/formatCurrency';
 
 interface ProductCardProps {
   product: Product;
@@ -18,26 +19,34 @@ const getProductImage = (product: Product): string => {
     return '/assets/generated/vixen-tt-ball.dim_400x400.png';
   }
   
-  // Fall back to category-based images
-  switch (product.category) {
-    case ProductCategory.tableTennisBalls:
-      return '/assets/generated/table-tennis-ball.dim_400x400.png';
-    case ProductCategory.badmintonShuttles:
-      return '/assets/generated/badminton-shuttle.dim_400x400.png';
-    default:
-      return '/assets/generated/table-tennis-ball.dim_400x400.png';
+  // Extract category name from ProductCategory union type
+  let categoryName = '';
+  if (typeof product.category === 'object' && product.category !== null) {
+    if ('name' in product.category && '__kind__' in product.category && product.category.__kind__ === 'name') {
+      categoryName = product.category.name.toLowerCase();
+    }
   }
+  
+  // Map known categories to images
+  if (categoryName.includes('table tennis') || categoryName.includes('tt')) {
+    return '/assets/generated/table-tennis-ball.dim_400x400.png';
+  } else if (categoryName.includes('badminton')) {
+    return '/assets/generated/badminton-shuttle.dim_400x400.png';
+  }
+  
+  // Fallback to a generic image
+  return '/assets/generated/table-tennis-ball.dim_400x400.png';
 };
 
 const getCategoryLabel = (category: ProductCategory): string => {
-  switch (category) {
-    case ProductCategory.tableTennisBalls:
-      return 'Table Tennis';
-    case ProductCategory.badmintonShuttles:
-      return 'Badminton';
-    default:
-      return 'Sports';
+  if (typeof category === 'object' && category !== null) {
+    if ('name' in category && '__kind__' in category && category.__kind__ === 'name') {
+      return category.name;
+    } else if ('__kind__' in category && category.__kind__ === 'customCategory') {
+      return 'Custom';
+    }
   }
+  return 'Product';
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -59,16 +68,30 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     setIsAdding(true);
+    console.log('[ProductCard] Adding product to cart:', { 
+      productId: product.id.toString(), 
+      productName: product.name 
+    });
+    
     try {
       await addToCart.mutateAsync({ productId: product.id, quantity: BigInt(1) });
       toast.success('Added to cart!', {
         description: `${product.name} has been added to your cart.`,
       });
     } catch (error) {
-      console.error('Add to cart error:', error);
-      toast.error('Failed to add to cart', {
-        description: error instanceof Error ? error.message : 'Please try again.',
-      });
+      console.error('[ProductCard] Add to cart error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Please try again.';
+      
+      // Check for authorization errors
+      if (errorMessage.includes('Unauthorized') || errorMessage.includes('permission')) {
+        toast.error('Unable to add to cart', {
+          description: 'There was an authorization issue. Please try logging out and back in.',
+        });
+      } else {
+        toast.error('Failed to add to cart', {
+          description: errorMessage,
+        });
+      }
     } finally {
       setIsAdding(false);
     }
@@ -109,7 +132,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </CardDescription>
         <div className="flex items-center justify-between">
           <div className="text-3xl font-black text-primary">
-            ₹{Number(product.price)}
+            {formatCurrency(product.price)}
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Package className="h-4 w-4" />
@@ -122,10 +145,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           className="w-full font-bold text-base h-12"
           size="lg"
           onClick={handleAddToCart}
-          disabled={isAdding || isOutOfStock}
+          disabled={isAdding || isOutOfStock || !isAuthenticated}
         >
           <ShoppingCart className="mr-2 h-5 w-5" />
-          {isAdding ? 'Adding...' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+          {!isAuthenticated ? 'Login to Order' : isAdding ? 'Adding...' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
         </Button>
       </CardFooter>
     </Card>

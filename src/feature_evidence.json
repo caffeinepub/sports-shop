@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-custom-sticker-pricing-functionality-specifically-for-sports-stickers-to-ensure-custom-prices-can-be-set-saved-and-displayed-correctly",
-      "featureTitle": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
+      "featureId": "feature-restore-the-admin-panel-link-in-the-header-navigation-that-was-removed-or-hidden-in-version-29-the-link-should-be-visible-to-authenticated-users-with-admin-privileges-and-navigate-to-admin",
+      "featureTitle": "Restore the admin panel link in the header navigation that was removed or hidden in Version 29. The link should be visible to authenticated users with admin privileges and navigate to '/admin'.",
       "files": [
-        "frontend/src/components/CustomStickerCard.tsx",
-        "frontend/src/components/CustomStickerForm.tsx"
+        "frontend/src/components/Layout.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -23,10 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-verify-that-the-customstickerform-correctly-converts-custom-prices-from-rupees-to-paise-for-all-product-categories-including-sports-items",
-      "featureTitle": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
+      "featureId": "feature-ensure-the-admin-role-checking-logic-is-functioning-correctly-and-properly-identifies-users-with-admin-privileges-based-on-their-internet-identity-principal",
+      "featureTitle": "Ensure the admin role checking logic is functioning correctly and properly identifies users with admin privileges based on their Internet Identity principal.",
       "files": [
-        "frontend/src/components/CustomStickerForm.tsx"
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -38,27 +37,7 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-verify-customstickercard-correctly-converts-stored-prices-from-paise-to-rupees-for-display-across-all-sports-categories",
-      "featureTitle": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
-      "files": [
-        "frontend/src/components/CustomStickerCard.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
+        "REQ-3"
       ],
       "confidence": "high"
     }

@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserPlus, Shield } from 'lucide-react';
-import { useAssignAdminRole } from '../hooks/useQueries';
+import { useAssignUserRole } from '../hooks/useQueries';
 import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
+import { UserRole } from '../backend';
 
 export default function AdminUserManagement() {
   const [principalInput, setPrincipalInput] = useState('');
-  const assignAdminRole = useAssignAdminRole();
+  const assignUserRole = useAssignUserRole();
 
   const handleGrantAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export default function AdminUserManagement() {
       // Validate principal format
       const principal = Principal.fromText(principalInput.trim());
       
-      await assignAdminRole.mutateAsync(principal);
+      await assignUserRole.mutateAsync({ user: principal, role: UserRole.admin });
       toast.success('Admin role granted successfully', {
         description: `User ${principalInput.slice(0, 10)}... is now an admin.`,
       });
@@ -64,7 +65,7 @@ export default function AdminUserManagement() {
               placeholder="Enter Internet Identity principal (e.g., xxxxx-xxxxx-xxxxx-xxxxx-xxx)"
               value={principalInput}
               onChange={(e) => setPrincipalInput(e.target.value)}
-              disabled={assignAdminRole.isPending}
+              disabled={assignUserRole.isPending}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
@@ -73,11 +74,11 @@ export default function AdminUserManagement() {
           </div>
           <Button
             type="submit"
-            disabled={assignAdminRole.isPending || !principalInput.trim()}
+            disabled={assignUserRole.isPending || !principalInput.trim()}
             className="w-full font-bold"
           >
             <UserPlus className="mr-2 h-4 w-4" />
-            {assignAdminRole.isPending ? 'Granting Admin Role...' : 'Grant Admin Role'}
+            {assignUserRole.isPending ? 'Granting Admin Role...' : 'Grant Admin Role'}
           </Button>
         </form>
       </CardContent>

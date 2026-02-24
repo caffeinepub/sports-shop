@@ -44,13 +44,12 @@ export interface Product {
   'category' : ProductCategory,
   'price' : bigint,
 }
-export type ProductCategory = { 'tableTennisBalls' : null } |
-  { 'badmintonShuttles' : null };
-export type StickerCategory = { 'patterns' : null } |
-  { 'food' : null } |
-  { 'animals' : null } |
-  { 'sports' : null } |
-  { 'cartoon' : null };
+export type ProductCategory = { 'id' : bigint } |
+  { 'name' : string } |
+  { 'customCategory' : null };
+export type StickerCategory = { 'id' : bigint } |
+  { 'name' : string } |
+  { 'customCategory' : null };
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -84,7 +83,7 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addProduct' : ActorMethod<
-    [string, string, ProductCategory, bigint],
+    [string, string, ProductCategory, bigint, bigint],
     [] | [bigint]
   >,
   'addToCart' : ActorMethod<[bigint, bigint], undefined>,
@@ -116,7 +115,7 @@ export interface _SERVICE {
   'updateCartItem' : ActorMethod<[bigint, bigint], undefined>,
   'updateOrderStatus' : ActorMethod<[bigint, OrderStatus], undefined>,
   'updateProduct' : ActorMethod<
-    [bigint, string, string, ProductCategory, bigint],
+    [bigint, string, string, ProductCategory, bigint, bigint],
     undefined
   >,
 }

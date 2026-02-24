@@ -5,17 +5,12 @@ import Runtime "mo:core/Runtime";
 import Array "mo:core/Array";
 import Principal "mo:core/Principal";
 
-import Migration "migration";
-
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-
 import Text "mo:core/Text";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 
-// Specify the data migration function in the with-clause
-(with migration = Migration.run)
 actor {
   type Product = {
     id : Nat;
@@ -34,16 +29,15 @@ actor {
   type Cart = [CartItem];
 
   type ProductCategory = {
-    #tableTennisBalls;
-    #badmintonShuttles;
+    #customCategory;
+    #id : Nat;
+    #name : Text;
   };
 
   type StickerCategory = {
-    #sports;
-    #animals;
-    #food;
-    #cartoon;
-    #patterns;
+    #customCategory;
+    #id : Nat;
+    #name : Text;
   };
 
   type PaymentMethod = {
@@ -91,6 +85,9 @@ actor {
   var nextOrderId = 0;
   var nextStickerId = 0;
 
+  var nextProductCategoryId = 0;
+  var nextStickerCategoryId = 0;
+
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
   include MixinStorage();
@@ -128,25 +125,55 @@ actor {
     products.values().toArray();
   };
 
-  public shared ({ caller }) func addProduct(name : Text, description : Text, category : ProductCategory, stock : Nat) : async ?Nat {
+  public shared ({ caller }) func addProduct(name : Text, description : Text, category : ProductCategory, stock : Nat, price : Nat) : async ?Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
 
-    let product : Product = {
-      id = nextProductId;
-      name;
-      description;
-      price = 20;
-      category;
-      stock;
+    switch (category) {
+      case (#customCategory) {
+        let product : Product = {
+          id = nextProductId;
+          name;
+          description;
+          price;
+          category;
+          stock;
+        };
+        products.add(nextProductId, product);
+        nextProductId += 1;
+        ?product.id;
+      };
+      case (#id _) {
+        let product : Product = {
+          id = nextProductId;
+          name;
+          description;
+          price;
+          category;
+          stock;
+        };
+        products.add(nextProductId, product);
+        nextProductId += 1;
+        ?product.id;
+      };
+      case (#name _) {
+        let product : Product = {
+          id = nextProductId;
+          name;
+          description;
+          price;
+          category;
+          stock;
+        };
+        products.add(nextProductId, product);
+        nextProductId += 1;
+        ?product.id;
+      };
     };
-    products.add(nextProductId, product);
-    nextProductId += 1;
-    ?product.id;
   };
 
-  public shared ({ caller }) func updateProduct(productId : Nat, name : Text, description : Text, category : ProductCategory, stock : Nat) : async () {
+  public shared ({ caller }) func updateProduct(productId : Nat, name : Text, description : Text, category : ProductCategory, stock : Nat, price : Nat) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
@@ -158,7 +185,7 @@ actor {
           id = productId;
           name;
           description;
-          price = 20;
+          price;
           category;
           stock;
         };
@@ -308,7 +335,7 @@ actor {
 
   public shared ({ caller }) func checkout(paymentMethod : PaymentMethod, deliveryAddress : Text) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can checkout");
+      Runtime.trap("Unauthorized: Only users can place orders");
     };
 
     let cart = switch (carts.get(caller)) {
@@ -482,4 +509,3 @@ actor {
     customStickers.values().toArray();
   };
 };
-

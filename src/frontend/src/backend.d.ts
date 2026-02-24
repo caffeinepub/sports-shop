@@ -14,6 +14,16 @@ export class ExternalBlob {
     static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
     withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
 }
+export type StickerCategory = {
+    __kind__: "id";
+    id: bigint;
+} | {
+    __kind__: "name";
+    name: string;
+} | {
+    __kind__: "customCategory";
+    customCategory: null;
+};
 export interface Order {
     customerName: string;
     status: OrderStatus;
@@ -37,6 +47,16 @@ export interface CartItem {
     productId: bigint;
     quantity: bigint;
 }
+export type ProductCategory = {
+    __kind__: "id";
+    id: bigint;
+} | {
+    __kind__: "name";
+    name: string;
+} | {
+    __kind__: "customCategory";
+    customCategory: null;
+};
 export interface Product {
     id: bigint;
     name: string;
@@ -57,24 +77,13 @@ export enum PaymentMethod {
     cash = "cash",
     googlePay = "googlePay"
 }
-export enum ProductCategory {
-    tableTennisBalls = "tableTennisBalls",
-    badmintonShuttles = "badmintonShuttles"
-}
-export enum StickerCategory {
-    patterns = "patterns",
-    food = "food",
-    animals = "animals",
-    sports = "sports",
-    cartoon = "cartoon"
-}
 export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
 }
 export interface backendInterface {
-    addProduct(name: string, description: string, category: ProductCategory, stock: bigint): Promise<bigint | null>;
+    addProduct(name: string, description: string, category: ProductCategory, stock: bigint, price: bigint): Promise<bigint | null>;
     addToCart(productId: bigint, quantity: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkout(paymentMethod: PaymentMethod, deliveryAddress: string): Promise<bigint>;
@@ -100,5 +109,5 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     updateCartItem(productId: bigint, quantity: bigint): Promise<void>;
     updateOrderStatus(orderId: bigint, status: OrderStatus): Promise<void>;
-    updateProduct(productId: bigint, name: string, description: string, category: ProductCategory, stock: bigint): Promise<void>;
+    updateProduct(productId: bigint, name: string, description: string, category: ProductCategory, stock: bigint, price: bigint): Promise<void>;
 }

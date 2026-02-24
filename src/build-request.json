@@ -1,84 +1,69 @@
 {
   "kind": "build_request",
-  "title": "Fix custom prices for sports stickers",
+  "title": "Restore missing admin panel access",
   "projectName": "Daily Sports Shop",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
-      "target": "both",
+      "text": "Restore the admin panel link in the header navigation that was removed or hidden in Version 29. The link should be visible to authenticated users with admin privileges and navigate to '/admin'.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-6"
         ],
         "quotes": [
-          "stickers is good but for sports i cant make custom prices"
+          "wow i lost my admin panell"
         ]
       },
       "acceptanceCriteria": [
-        "Custom prices can be set for sports stickers in the custom sticker creation form",
-        "Custom prices are saved correctly to the backend for sports stickers",
-        "Custom prices display correctly in the stickers gallery for sports items",
-        "Custom prices appear correctly in the cart for sports stickers",
-        "Price conversion between rupees (frontend display) and paise (backend storage) works correctly for sports stickers"
+        "Admin panel link appears in the header navigation for authenticated admin users",
+        "Clicking the admin panel link navigates to the /admin route",
+        "Non-admin users do not see the admin panel link",
+        "Unauthenticated users do not see the admin panel link"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
+      "text": "Verify that the /admin route is properly configured and accessible in the router configuration, ensuring it renders the AdminPanel page component.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-6"
         ]
       },
       "acceptanceCriteria": [
-        "Price input in CustomStickerForm accepts decimal values for rupees",
-        "Price conversion multiplies by 100 to convert rupees to paise before backend submission",
-        "Conversion logic works consistently for both table tennis and badminton categories"
+        "Navigating directly to /admin route renders the AdminPanel component",
+        "Admin panel route is included in the router configuration",
+        "Access control correctly restricts non-admin users from viewing the admin panel"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Ensure the backend CustomSticker type and createCustomSticker function properly handle and store custom prices for sports categories",
-      "target": "backend",
+      "text": "Ensure the admin role checking logic is functioning correctly and properly identifies users with admin privileges based on their Internet Identity principal.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-6"
         ]
       },
       "acceptanceCriteria": [
-        "Custom sticker records store price values in paise (Nat)",
-        "createCustomSticker function accepts and persists custom price values",
-        "Price data is retrievable via getCustomStickers query for all categories"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Prices display with proper decimal formatting (divided by 100)",
-        "Currency symbol (₹) appears correctly",
-        "Price display is consistent for both table tennis and badminton stickers"
+        "Backend correctly validates admin principals against stored admin list",
+        "Frontend correctly receives and interprets admin status from backend",
+        "Admin-only UI elements conditionally render based on accurate admin status"
       ]
     }
   ],
   "constraints": [
-    "Do not change the existing price storage format (paise as Nat in backend)",
-    "Maintain backward compatibility with existing custom stickers",
-    "Preserve the existing authentication and authorization flow"
+    "Do not modify the existing access control authorization system",
+    "Preserve the current admin role management functionality",
+    "Do not change the AdminPanel or AdminOrders page components unless necessary for access restoration"
   ],
   "nonGoals": [
-    "Changing the overall pricing model for regular products",
-    "Modifying the cart checkout flow",
-    "Adding new product categories beyond table tennis and badminton"
+    "Adding new admin features or capabilities",
+    "Redesigning the admin panel interface",
+    "Modifying admin user management functionality",
+    "Changing the authentication flow"
   ],
   "imageRequirements": {
     "required": [],

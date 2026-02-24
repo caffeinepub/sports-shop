@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix custom pricing functionality for sports stickers to enable setting, saving, and displaying custom prices correctly.
+**Goal:** Restore missing admin panel access that was removed in Version 29.
 
 **Planned changes:**
-- Fix custom price input and conversion (rupees to paise) in the sports sticker creation form
-- Ensure backend properly stores and retrieves custom prices for sports categories
-- Fix price display conversion (paise to rupees) in stickers gallery and cart for sports items
-- Verify price handling works consistently for both table tennis and badminton categories
+- Add admin panel link back to header navigation for authenticated admin users
+- Verify /admin route is properly configured in router
+- Ensure admin role checking logic correctly identifies admin users by their Internet Identity principal
 
-**User-visible outcome:** Users can successfully set custom prices for sports stickers, which display correctly throughout the application including the gallery and cart.
+**User-visible outcome:** Admin users can access the admin panel via a visible link in the header navigation.

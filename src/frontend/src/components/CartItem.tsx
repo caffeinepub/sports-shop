@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { ProductCategory, Product } from '../backend';
 import { CartItem as CartItemType } from '../types';
-import { useUpdateCartItem, useRemoveCartItem, useGetProduct, useGetCustomSticker } from '../hooks/useQueries';
+import { useUpdateCartItem, useRemoveCartItem, useGetProduct } from '../hooks/useQueries';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import { formatCurrency } from '../utils/formatCurrency';
 
 interface CartItemProps {
   item: CartItemType;
@@ -17,25 +18,31 @@ const getProductImage = (product: Product): string => {
     return '/assets/generated/vixen-tt-ball.dim_400x400.png';
   }
   
-  // Fall back to category-based images
-  switch (product.category) {
-    case ProductCategory.tableTennisBalls:
-      return '/assets/generated/table-tennis-ball.dim_400x400.png';
-    case ProductCategory.badmintonShuttles:
-      return '/assets/generated/badminton-shuttle.dim_400x400.png';
-    default:
-      return '/assets/generated/table-tennis-ball.dim_400x400.png';
+  // Extract category name from ProductCategory union type
+  let categoryName = '';
+  if (typeof product.category === 'object' && product.category !== null) {
+    if ('name' in product.category && '__kind__' in product.category && product.category.__kind__ === 'name') {
+      categoryName = product.category.name.toLowerCase();
+    }
   }
+  
+  // Map known categories to images
+  if (categoryName.includes('table tennis') || categoryName.includes('tt')) {
+    return '/assets/generated/table-tennis-ball.dim_400x400.png';
+  } else if (categoryName.includes('badminton')) {
+    return '/assets/generated/badminton-shuttle.dim_400x400.png';
+  }
+  
+  // Fallback to a generic image
+  return '/assets/generated/table-tennis-ball.dim_400x400.png';
 };
 
 export default function CartItem({ item }: CartItemProps) {
   const updateCartItem = useUpdateCartItem();
   const removeCartItem = useRemoveCartItem();
   
-  // Try to fetch as regular product first
+  // Cart only contains regular products (not custom stickers)
   const { data: product } = useGetProduct(item.productId);
-  // Try to fetch as custom sticker
-  const { data: customSticker } = useGetCustomSticker(item.productId);
 
   const [itemData, setItemData] = useState<{
     name: string;
@@ -43,26 +50,11 @@ export default function CartItem({ item }: CartItemProps) {
     price: bigint;
     image: string;
     stock?: bigint;
-    isCustomSticker: boolean;
   } | null>(null);
 
   useEffect(() => {
-    if (customSticker) {
-      console.log('[CartItem] Custom sticker in cart:', {
-        id: customSticker.id.toString(),
-        name: customSticker.name,
-        priceInPaise: customSticker.price.toString(),
-        priceInRupees: Number(customSticker.price) / 100,
-      });
-      setItemData({
-        name: customSticker.name,
-        description: customSticker.description || undefined,
-        price: customSticker.price,
-        image: customSticker.image.getDirectURL(),
-        isCustomSticker: true,
-      });
-    } else if (product) {
-      console.log('[CartItem] Regular product in cart:', {
+    if (product) {
+      console.log('[CartItem] Product in cart:', {
         id: product.id.toString(),
         name: product.name,
         priceInPaise: product.price.toString(),
@@ -74,16 +66,15 @@ export default function CartItem({ item }: CartItemProps) {
         price: product.price,
         image: getProductImage(product),
         stock: product.stock,
-        isCustomSticker: false,
       });
     }
-  }, [product, customSticker]);
+  }, [product]);
 
   const handleUpdateQuantity = async (newQuantity: number) => {
     if (newQuantity < 1) return;
     
-    // Check stock for regular products
-    if (itemData && !itemData.isCustomSticker && itemData.stock !== undefined) {
+    // Check stock for products
+    if (itemData && itemData.stock !== undefined) {
       if (newQuantity > Number(itemData.stock)) {
         toast.error('Not enough stock', {
           description: `Only ${itemData.stock} items available.`,
@@ -132,8 +123,7 @@ export default function CartItem({ item }: CartItemProps) {
   }
 
   const quantity = Number(item.quantity);
-  const price = Number(itemData.price);
-  const subtotal = (price * quantity) / 100; // Convert paise to rupees
+  const subtotalInPaise = itemData.price * BigInt(quantity);
 
   return (
     <Card>
@@ -155,7 +145,7 @@ export default function CartItem({ item }: CartItemProps) {
             )}
             <div className="flex items-center gap-4 flex-wrap">
               <div className="text-lg font-bold text-primary">
-                ₹{(price / 100).toFixed(2)}
+                {formatCurrency(itemData.price)}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -179,7 +169,7 @@ export default function CartItem({ item }: CartItemProps) {
                 </Button>
               </div>
               <div className="text-lg font-bold ml-auto">
-                ₹{subtotal.toFixed(2)}
+                {formatCurrency(subtotalInPaise)}
               </div>
             </div>
           </div>

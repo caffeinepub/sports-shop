@@ -49,14 +49,14 @@ export default function AdminPanel() {
   };
 
   const getCategoryLabel = (category: ProductCategory): string => {
-    switch (category) {
-      case ProductCategory.tableTennisBalls:
-        return 'Table Tennis';
-      case ProductCategory.badmintonShuttles:
-        return 'Badminton';
-      default:
-        return 'Sports';
+    if (typeof category === 'object' && category !== null) {
+      if ('name' in category && '__kind__' in category && category.__kind__ === 'name') {
+        return category.name;
+      } else if ('__kind__' in category && category.__kind__ === 'customCategory') {
+        return 'Custom';
+      }
     }
+    return 'Product';
   };
 
   // Show loading state while checking authentication and admin status
@@ -155,7 +155,7 @@ export default function AdminPanel() {
                         <div className="flex gap-6 text-sm">
                           <div>
                             <span className="text-muted-foreground">Price: </span>
-                            <span className="font-bold text-primary">₹{Number(product.price)}</span>
+                            <span className="font-bold text-primary">₹{(Number(product.price) / 100).toFixed(2)}</span>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Stock: </span>

@@ -1,65 +1,54 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix custom prices for sports stickers",
+  "title": "Restore missing admin panel access",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
+      "summary": "Restore the admin panel link in the header navigation for authenticated admin users",
       "acceptanceCriteria": [
-        "Custom prices can be set for sports stickers in the custom sticker creation form",
-        "Custom prices are saved correctly to the backend for sports stickers",
-        "Custom prices display correctly in the stickers gallery for sports items",
-        "Custom prices appear correctly in the cart for sports stickers",
-        "Price conversion between rupees (frontend display) and paise (backend storage) works correctly for sports stickers"
+        "Admin panel link appears in the header navigation for authenticated admin users",
+        "Clicking the admin panel link navigates to the /admin route",
+        "Non-admin users do not see the admin panel link",
+        "Unauthenticated users do not see the admin panel link"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/CustomStickerForm.tsx",
+          "path": "frontend/src/components/Layout.tsx",
           "operation": "modify",
-          "description": "Review and fix the price conversion logic to ensure custom prices are properly converted from rupees to paise (multiply by 100) before submission to the backend for all categories including sports stickers. Verify that the price input accepts decimal values and the conversion applies consistently to both table tennis and badminton categories in the sports category."
-        },
-        {
-          "path": "frontend/src/components/CustomStickerCard.tsx",
-          "operation": "modify",
-          "description": "Review and fix the price display logic to ensure stored prices in paise are correctly converted to rupees (divide by 100) for display with proper decimal formatting and currency symbol (₹). Ensure the conversion works consistently for all categories including sports stickers (table tennis and badminton)."
-        },
-        {
-          "path": "frontend/src/components/CartItem.tsx",
-          "operation": "modify",
-          "description": "Review and verify the price display logic for custom stickers in the cart to ensure prices stored in paise are correctly converted to rupees for display. Fix any inconsistencies in price formatting for sports category stickers, ensuring proper decimal formatting and currency symbol display."
+          "description": "Add the admin panel navigation link back to the header navigation. The link should be conditionally rendered for authenticated users with admin privileges using the isCallerAdmin query hook. Position the link in the main navigation menu between existing nav items. The link should navigate to '/admin' and display 'Admin Panel' text."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
+      "summary": "Verify and ensure the /admin route is properly configured in the router",
       "acceptanceCriteria": [
-        "Price input in CustomStickerForm accepts decimal values for rupees",
-        "Price conversion multiplies by 100 to convert rupees to paise before backend submission",
-        "Conversion logic works consistently for both table tennis and badminton categories"
+        "Navigating directly to /admin route renders the AdminPanel component",
+        "Admin panel route is included in the router configuration",
+        "Access control correctly restricts non-admin users from viewing the admin panel"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/CustomStickerForm.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Verify the price input field accepts decimal values and ensure the conversion logic multiplies the input value by 100 to convert rupees to paise before calling createCustomSticker. Add validation to ensure the conversion applies consistently regardless of the selected category, including both table tennis and badminton under the sports category."
+          "description": "Verify that the /admin route is properly configured and registered in the router configuration. Ensure the route maps to the AdminPanel component and that access control is correctly applied to restrict non-admin users from viewing the admin panel."
         }
       ]
     },
     {
-      "id": "REQ-4",
-      "summary": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
+      "id": "REQ-3",
+      "summary": "Ensure the admin role checking logic is functioning correctly in the frontend",
       "acceptanceCriteria": [
-        "Prices display with proper decimal formatting (divided by 100)",
-        "Currency symbol (₹) appears correctly",
-        "Price display is consistent for both table tennis and badminton stickers"
+        "Backend correctly validates admin principals against stored admin list",
+        "Frontend correctly receives and interprets admin status from backend",
+        "Admin-only UI elements conditionally render based on accurate admin status"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/CustomStickerCard.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Verify the price display logic divides the stored paise value by 100 to convert to rupees, formats with two decimal places, and includes the ₹ currency symbol. Ensure this conversion and formatting works consistently for all sticker categories including sports (table tennis and badminton)."
+          "description": "Verify that the useIsCallerAdmin query hook is correctly implemented and properly fetches the admin status from the backend isCallerAdmin method. Ensure the query is enabled only when the actor is available and authenticated, and that it returns the correct boolean admin status for conditional rendering of admin-only UI elements."
         }
       ]
     }

@@ -1,58 +1,40 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Sports themed sticker app with custom pricing functionality",
-  "architectural_notes": [
-    "App has sticker functionality with category support (stickers, sports)",
-    "Custom pricing feature exists but has category-specific issues"
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [
-    "Custom prices not saving/working for sports category"
+    "Admin panel missing after Version 29 deployment"
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-fix-the-custom-sticker-pricing-functionality-specifically-for-sports-stickers-to-ensure-custom-prices-can-be-set-saved-and-displayed-correctly",
-      "title": "Fix the custom sticker pricing functionality specifically for sports stickers to ensure custom prices can be set, saved, and displayed correctly",
+      "id": "feature-restore-the-admin-panel-link-in-the-header-navigation-that-was-removed-or-hidden-in-version-29-the-link-should-be-visible-to-authenticated-users-with-admin-privileges-and-navigate-to-admin",
+      "title": "Restore the admin panel link in the header navigation that was removed or hidden in Version 29. The link should be visible to authenticated users with admin privileges and navigate to '/admin'.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-verify-that-the-customstickerform-correctly-converts-custom-prices-from-rupees-to-paise-for-all-product-categories-including-sports-items",
-      "title": "Verify that the CustomStickerForm correctly converts custom prices from rupees to paise for all product categories including sports items",
+      "id": "feature-ensure-the-admin-role-checking-logic-is-functioning-correctly-and-properly-identifies-users-with-admin-privileges-based-on-their-internet-identity-principal",
+      "title": "Ensure the admin role checking logic is functioning correctly and properly identifies users with admin privileges based on their Internet Identity principal.",
       "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-verify-customstickercard-correctly-converts-stored-prices-from-paise-to-rupees-for-display-across-all-sports-categories",
-      "title": "Verify CustomStickerCard correctly converts stored prices from paise to rupees for display across all sports categories",
-      "reqIds": [
-        "REQ-4"
+        "REQ-3"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-1",
-      "summary": "Fix custom prices not working for sports category",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Ensure the backend CustomSticker type and createCustomSticker function properly handle and store custom prices for sports categories",
+      "id": "AR-2",
+      "summary": "Verify that the /admin route is properly configured and accessible in the router configuration, ensuring it renders the AdminPanel page component.",
       "reqIds": [
-        "REQ-3"
+        "REQ-2"
       ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
   "projectName": "Daily Sports Shop",
   "clarification_mode": "instant",
   "clarification_rounds": 0

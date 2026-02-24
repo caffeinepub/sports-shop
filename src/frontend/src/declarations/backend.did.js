@@ -20,8 +20,9 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
 export const ProductCategory = IDL.Variant({
-  'tableTennisBalls' : IDL.Null,
-  'badmintonShuttles' : IDL.Null,
+  'id' : IDL.Nat,
+  'name' : IDL.Text,
+  'customCategory' : IDL.Null,
 });
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
@@ -34,11 +35,9 @@ export const PaymentMethod = IDL.Variant({
 });
 export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const StickerCategory = IDL.Variant({
-  'patterns' : IDL.Null,
-  'food' : IDL.Null,
-  'animals' : IDL.Null,
-  'sports' : IDL.Null,
-  'cartoon' : IDL.Null,
+  'id' : IDL.Nat,
+  'name' : IDL.Text,
+  'customCategory' : IDL.Null,
 });
 export const CustomSticker = IDL.Record({
   'id' : IDL.Nat,
@@ -107,7 +106,7 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addProduct' : IDL.Func(
-      [IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
+      [IDL.Text, IDL.Text, ProductCategory, IDL.Nat, IDL.Nat],
       [IDL.Opt(IDL.Nat)],
       [],
     ),
@@ -149,7 +148,7 @@ export const idlService = IDL.Service({
   'updateCartItem' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
   'updateOrderStatus' : IDL.Func([IDL.Nat, OrderStatus], [], []),
   'updateProduct' : IDL.Func(
-      [IDL.Nat, IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
+      [IDL.Nat, IDL.Text, IDL.Text, ProductCategory, IDL.Nat, IDL.Nat],
       [],
       [],
     ),
@@ -170,8 +169,9 @@ export const idlFactory = ({ IDL }) => {
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
   const ProductCategory = IDL.Variant({
-    'tableTennisBalls' : IDL.Null,
-    'badmintonShuttles' : IDL.Null,
+    'id' : IDL.Nat,
+    'name' : IDL.Text,
+    'customCategory' : IDL.Null,
   });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
@@ -184,11 +184,9 @@ export const idlFactory = ({ IDL }) => {
   });
   const ExternalBlob = IDL.Vec(IDL.Nat8);
   const StickerCategory = IDL.Variant({
-    'patterns' : IDL.Null,
-    'food' : IDL.Null,
-    'animals' : IDL.Null,
-    'sports' : IDL.Null,
-    'cartoon' : IDL.Null,
+    'id' : IDL.Nat,
+    'name' : IDL.Text,
+    'customCategory' : IDL.Null,
   });
   const CustomSticker = IDL.Record({
     'id' : IDL.Nat,
@@ -254,7 +252,7 @@ export const idlFactory = ({ IDL }) => {
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addProduct' : IDL.Func(
-        [IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
+        [IDL.Text, IDL.Text, ProductCategory, IDL.Nat, IDL.Nat],
         [IDL.Opt(IDL.Nat)],
         [],
       ),
@@ -304,7 +302,7 @@ export const idlFactory = ({ IDL }) => {
     'updateCartItem' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'updateOrderStatus' : IDL.Func([IDL.Nat, OrderStatus], [], []),
     'updateProduct' : IDL.Func(
-        [IDL.Nat, IDL.Text, IDL.Text, ProductCategory, IDL.Nat],
+        [IDL.Nat, IDL.Text, IDL.Text, ProductCategory, IDL.Nat, IDL.Nat],
         [],
         [],
       ),

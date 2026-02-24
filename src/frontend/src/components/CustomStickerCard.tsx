@@ -4,61 +4,40 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, ImageIcon } from 'lucide-react';
 import { CustomSticker, StickerCategory } from '../backend';
-import { useAddToCart } from '../hooks/useQueries';
 import { toast } from 'sonner';
+import { formatCurrency } from '../utils/formatCurrency';
 
 interface CustomStickerCardProps {
   sticker: CustomSticker;
 }
 
 const getCategoryLabel = (category: StickerCategory): string => {
-  switch (category) {
-    case StickerCategory.sports:
-      return 'Sports';
-    case StickerCategory.animals:
-      return 'Animals';
-    case StickerCategory.food:
-      return 'Food';
-    case StickerCategory.cartoon:
-      return 'Cartoon';
-    case StickerCategory.patterns:
-      return 'Patterns';
-    default:
-      return 'Other';
+  if (typeof category === 'object' && category !== null) {
+    if ('name' in category && '__kind__' in category && category.__kind__ === 'name') {
+      return category.name;
+    } else if ('__kind__' in category && category.__kind__ === 'customCategory') {
+      return 'Custom';
+    }
   }
+  return 'Other';
 };
 
 export default function CustomStickerCard({ sticker }: CustomStickerCardProps) {
-  const [isAdding, setIsAdding] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const addToCart = useAddToCart();
 
   const handleAddToCart = async () => {
-    setIsAdding(true);
-    try {
-      await addToCart.mutateAsync({ productId: sticker.id, quantity: BigInt(1) });
-      toast.success('Added to cart!', {
-        description: `${sticker.name} has been added to your cart.`,
-      });
-    } catch (error) {
-      console.error('Add to cart error:', error);
-      toast.error('Failed to add to cart', {
-        description: error instanceof Error ? error.message : 'Please try again.',
-      });
-    } finally {
-      setIsAdding(false);
-    }
+    // Custom stickers cannot be added to cart - the backend cart system only supports regular products
+    toast.error('Feature not available', {
+      description: 'Custom stickers cannot be added to cart at this time.',
+    });
   };
-
-  // Convert price from paise to rupees
-  const priceInRupees = Number(sticker.price) / 100;
 
   console.log('[CustomStickerCard] Displaying sticker:', {
     id: sticker.id.toString(),
     name: sticker.name,
     category: sticker.category,
     priceInPaise: sticker.price.toString(),
-    priceInRupees,
+    priceInRupees: Number(sticker.price) / 100,
   });
 
   return (
@@ -89,12 +68,12 @@ export default function CustomStickerCard({ sticker }: CustomStickerCardProps) {
           {sticker.name}
         </CardTitle>
         {sticker.description && (
-          <p className="text-base text-muted-foreground mb-4 line-clamp-2">
+          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
             {sticker.description}
           </p>
         )}
         <div className="text-3xl font-black text-primary">
-          ₹{priceInRupees.toFixed(2)}
+          {formatCurrency(sticker.price)}
         </div>
       </CardContent>
       <CardFooter className="p-6 pt-0">
@@ -102,10 +81,10 @@ export default function CustomStickerCard({ sticker }: CustomStickerCardProps) {
           className="w-full font-bold text-base h-12"
           size="lg"
           onClick={handleAddToCart}
-          disabled={isAdding}
+          variant="outline"
         >
           <ShoppingCart className="mr-2 h-5 w-5" />
-          {isAdding ? 'Adding...' : 'Add to Cart'}
+          View Details
         </Button>
       </CardFooter>
     </Card>

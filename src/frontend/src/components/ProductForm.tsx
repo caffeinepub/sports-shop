@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -18,8 +17,9 @@ interface ProductFormProps {
 export default function ProductForm({ product, onClose }: ProductFormProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<'tableTennisBalls' | 'badmintonShuttles'>('tableTennisBalls');
+  const [category, setCategory] = useState('');
   const [stock, setStock] = useState('');
+  const [price, setPrice] = useState('');
 
   const addProduct = useAddProduct();
   const updateProduct = useUpdateProduct();
@@ -32,12 +32,15 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
       setName(product.name);
       setDescription(product.description);
       setStock(product.stock.toString());
+      setPrice((Number(product.price) / 100).toString());
       
-      // ProductCategory is an enum, compare directly
-      if (product.category === ProductCategory.tableTennisBalls) {
-        setCategory('tableTennisBalls');
-      } else if (product.category === ProductCategory.badmintonShuttles) {
-        setCategory('badmintonShuttles');
+      // Extract category name from ProductCategory union type
+      if (typeof product.category === 'object' && product.category !== null) {
+        if ('name' in product.category && '__kind__' in product.category && product.category.__kind__ === 'name') {
+          setCategory(product.category.name);
+        } else if ('__kind__' in product.category && product.category.__kind__ === 'customCategory') {
+          setCategory('');
+        }
       }
     }
   }, [product]);
@@ -54,17 +57,29 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
       toast.error('Product description is required');
       return;
     }
+    if (!category.trim()) {
+      toast.error('Product category is required');
+      return;
+    }
     const stockNum = parseInt(stock);
     if (isNaN(stockNum) || stockNum < 0) {
       toast.error('Please enter a valid stock quantity');
       return;
     }
+    const priceNum = parseFloat(price);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      toast.error('Please enter a valid price greater than 0');
+      return;
+    }
 
-    // Convert category to backend enum format
-    const categoryEnum: ProductCategory = 
-      category === 'tableTennisBalls' 
-        ? ProductCategory.tableTennisBalls 
-        : ProductCategory.badmintonShuttles;
+    // Convert category to backend format using name variant
+    const categoryData: ProductCategory = {
+      __kind__: 'name',
+      name: category.trim(),
+    };
+
+    // Convert price from rupees to paise
+    const priceInPaise = BigInt(Math.round(priceNum * 100));
 
     try {
       if (isEditMode && product) {
@@ -72,16 +87,18 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
           productId: product.id,
           name: name.trim(),
           description: description.trim(),
-          category: categoryEnum,
+          category: categoryData,
           stock: BigInt(stockNum),
+          price: priceInPaise,
         });
         toast.success('Product updated successfully');
       } else {
         await addProduct.mutateAsync({
           name: name.trim(),
           description: description.trim(),
-          category: categoryEnum,
+          category: categoryData,
           stock: BigInt(stockNum),
+          price: priceInPaise,
         });
         toast.success('Product added successfully');
       }
@@ -118,28 +135,36 @@ export default function ProductForm({ product, onClose }: ProductFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="price">Price (₹)</Label>
+          <Label htmlFor="category">Category</Label>
           <Input
-            id="price"
+            id="category"
             type="text"
-            value="20"
-            disabled
-            className="bg-muted"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            placeholder="e.g., Table Tennis, Badminton, Cricket"
+            disabled={isSubmitting}
           />
-          <p className="text-xs text-muted-foreground">Price is fixed at ₹20 for all products</p>
+          <p className="text-xs text-muted-foreground">Enter any product category</p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="category">Category</Label>
-          <Select value={category} onValueChange={(value: any) => setCategory(value)} disabled={isSubmitting}>
-            <SelectTrigger id="category">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="tableTennisBalls">Table Tennis Balls</SelectItem>
-              <SelectItem value="badmintonShuttles">Badminton Shuttles</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="price">Price (₹)</Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              ₹
+            </span>
+            <Input
+              id="price"
+              type="number"
+              step="0.01"
+              min="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="0.00"
+              disabled={isSubmitting}
+              className="pl-8"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">

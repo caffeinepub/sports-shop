@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, Image as ImageIcon } from 'lucide-react';
 import { useCreateCustomSticker } from '../hooks/useQueries';
 import { toast } from 'sonner';
@@ -18,7 +17,7 @@ export default function CustomStickerForm({ onSuccess }: CustomStickerFormProps)
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [category, setCategory] = useState<StickerCategory | ''>('');
+  const [category, setCategory] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -66,9 +65,9 @@ export default function CustomStickerForm({ onSuccess }: CustomStickerFormProps)
       return;
     }
 
-    if (!category) {
+    if (!category.trim()) {
       toast.error('Category is required', {
-        description: 'Please select a category for your sticker.',
+        description: 'Please enter a category for your sticker.',
       });
       return;
     }
@@ -101,18 +100,24 @@ export default function CustomStickerForm({ onSuccess }: CustomStickerFormProps)
       const priceInRupees = parseFloat(price);
       const priceInPaise = BigInt(Math.round(priceInRupees * 100));
       
+      // Create category using name variant
+      const categoryData: StickerCategory = {
+        __kind__: 'name',
+        name: category.trim(),
+      };
+      
       console.log('[CustomStickerForm] Price conversion:', {
         inputPrice: price,
         priceInRupees,
         priceInPaise: priceInPaise.toString(),
-        category,
+        category: categoryData,
       });
 
       const result = await createSticker.mutateAsync({
         image: blob,
         price: priceInPaise,
         name: name.trim(),
-        category: category as StickerCategory,
+        category: categoryData,
         description: description.trim() || null,
       });
 
@@ -205,22 +210,16 @@ export default function CustomStickerForm({ onSuccess }: CustomStickerFormProps)
       {/* Category */}
       <div className="space-y-2">
         <Label htmlFor="category">Category *</Label>
-        <Select
+        <Input
+          id="category"
+          type="text"
+          placeholder="e.g., Sports, Animals, Food, Cartoon"
           value={category}
-          onValueChange={(value) => setCategory(value as StickerCategory)}
+          onChange={(e) => setCategory(e.target.value)}
           disabled={isSubmitting}
-        >
-          <SelectTrigger id="category">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={StickerCategory.sports}>Sports</SelectItem>
-            <SelectItem value={StickerCategory.animals}>Animals</SelectItem>
-            <SelectItem value={StickerCategory.food}>Food</SelectItem>
-            <SelectItem value={StickerCategory.cartoon}>Cartoon</SelectItem>
-            <SelectItem value={StickerCategory.patterns}>Patterns</SelectItem>
-          </SelectContent>
-        </Select>
+          required
+        />
+        <p className="text-xs text-muted-foreground">Enter any category name</p>
       </div>
 
       {/* Description */}
